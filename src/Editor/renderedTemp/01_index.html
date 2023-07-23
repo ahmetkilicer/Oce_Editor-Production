@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{seqId}}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0">  
+    <link href="css/style.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+    <div class="main-page">
+        <img class="background-image" usemap="#Map" src="{{asset.img.name}}" alt="">
+        <map name="Map">
+            {% for a in asset_coordinates %}
+                {% if a.coordinate_type == 'link' %}
+                    <area shape="rect" data-coord="{{ a.start_left }},{{ a.start_top }},{{ a.end_left }},{{ a.end_top }}" coords="" alt="" onclick="CLMPlayer.gotoSlide('{{a.linked_asset_name}}','01_index.html',null); return false;">
+                {% endif %}
+                {% if a.coordinate_type == 'popup' %}
+                    <area class="popup-anchor" shape="rect" data-coord="{{ a.start_left }},{{ a.start_top }},{{ a.end_left }},{{ a.end_top }}" coords="" alt="" onclick="openPopup('{{ a.id }}'); return false;">
+                {% endif %}
+                {% if a.coordinate_type == 'video' %}
+                    <area class="video-anchor" shape="rect" data-coord="{{ a.start_left }},{{ a.start_top }},{{ a.end_left }},{{ a.end_top }}" coords="" alt="" onclick="openVideo('{{ a.id }}'); return false;">
+                {% endif %}
+            {% endfor %}
+        </map>
+        {% for a in asset_coordinates %}
+            {% if a.coordinate_type == 'popup' %}
+                <div class="image-popup-container" id="popup-{{ a.id }}">
+                    <a class="close-button" onclick="closePopup('{{ a.id }}')"></a>
+                    <!-- Add your image content here -->
+                    <img src="media/{{ a.image.name }}" alt="Image">
+                </div>
+            {% endif %}
+            {% if a.coordinate_type == 'video' and a.is_embedded == False  %}
+                <div class="video-container" id="video-{{ a.id }}">
+                    <a class="close-button" onclick="closeVideo('{{ a.id }}')"></a>
+                    <video preload="auto" controls playsinline>
+                        <source src="media/{{ a.video.name }}"type="video/mp4">
+                    </video>
+                </div>
+            {% elif  a.coordinate_type == 'video' and a.is_embedded == True%}
+                <div class='video-embedded' data-coord="{{ a.start_left }},{{ a.start_top }},{{ a.end_left }},{{ a.end_top }}" >
+                    <video preload="auto" controls playsinline style="max-height:100%;max-width:100%;">
+                        <source src="media/{{ a.video.name }}"type="video/mp4">
+                    </video>    
+                </div>        
+            {% endif %}
+        {% endfor %}  
+    </div>
+    <!-- Include your JavaScript code for handling the popups here -->
+    <script src="js/script.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,1485 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr-TR" class="js">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="HTML and PDF Editor for OCE App, Produced by IQVIA">
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="{% static 'images/iqvialogoicon.png' %}">
+    <!-- Page Title  -->
+    <title>IQVIA | OCE Editor</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="{% static 'css/dashlite.css' %}">
+    <link id="skin-default" rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+</head>
+<style>
+    .nk-fmg-body{
+        width: calc(100% - 260px);
+        position: relative;
+        overflow-y: hidden;
+        justify-content: center;
+        align-items: center;
+        
+    }
+    .nk-fmg-body-content{
+        overflow-y: hidden;
+        width: 700px;
+        margin: auto;
+        position: fixed;
+        top: 60px;
+     }
+    .framephoto{
+        width: 100%;
+        width: 640px;
+        overflow: hidden;
+        border: 2px solid green;
+        position: relative;
+
+    }
+    #draggable { 
+        width: 100px; 
+        height: 50px; 
+        border-radius: 10px; 
+        position: fixed; 
+        border: 5px; 
+        background-color: rgba(0,0,0,0.4);
+        z-index: 30;
+        cursor:grab;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        resize: both; 
+    }
+    #draggable:hover, #sortable:hover{
+        cursor: pointer;
+    }
+    #draggable:active{
+        cursor: grabbing;
+    }
+  
+    #sortable:active{
+        cursor: grabbing;
+    }
+    .sequencenametabs{
+        margin:auto;
+    }
+    .full-page-mode {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999;
+        background-color: #fff;
+        overflow-y: scroll;
+    }
+
+    .full-page-mode .sticky-top {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+        transition: all 1s linear;
+    }
+
+    .full-page-mode .pushtop{
+        margin-top:90px;
+    }
+    .full-page-mode ul {
+        max-width:100% !important;
+    }
+
+    .full-page-mode #sortable {
+        list-style-type: none;padding: auto; width: 100%;
+        transition: all 0.2s ease;
+    }
+
+    .full-page-mode #sortable li {
+        margin: 10px; padding: 1px; float: left; max-width: 120px;  text-align: center; 
+        max-height:120px;
+    }
+    .full-page-mode #sortable li img{
+        width: 120px;
+        max-height:75px;
+        object-fit: cover;
+    }
+    .full-page-mode #sortable li p{
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #toggleFullPageBtn{
+        border:none;
+        font-size:25px;
+        background:none; 
+        position:fixed; 
+        top:101px; 
+        left:160px;
+        color:#063970;
+    }
+
+    .full-page-mode #toggleFullPageBtn {
+        top:120px; 
+        left:40px;
+      }
+      .card-inner1 {
+        display: flex;
+        justify-content:space-between;
+        align-items: center;
+      }
+      
+      .card-text1 {
+        margin: 0;
+        width: 140px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      
+      .delete-cards {
+        font-size: 20px;
+        color: red;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+      #closable-div{
+          display:none;
+          position:fixed;
+            border-radius: 10px; 
+            position: fixed; 
+            border: 5px; 
+            z-index: 30;
+            justify-content: center;
+            align-items: center;
+            resize: both; 
+      }
+      .AcList{
+        cursor:pointer;
+      }
+      #coordText {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      
+      #coordText {
+        font-size: 1rem;
+      }
+    
+      
+      
+      
+      
+</style>
+
+
+<body class="nk-body npc-apps apps-only has-apps-sidebar npc-apps-files">
+    {% if user.dark_mode %}
+    <script>
+        var toggle = document.getElementsByClassName('dark-switch')[0];
+        var body = document.getElementsByTagName('body')[0];
+        body.classList.add('dark-mode');
+        toggle.classList.add('active');
+    </script>
+    {% endif %}
+    <div class="nk-app-root">
+        <!-- main @s -->
+        <div class="nk-main ">
+            <!-- wrap @s -->
+            <div class="nk-wrap ">
+                <!-- main header @s -->
+                <div class="nk-header nk-header-fixed is-light">
+                    <div class="container-fluid">
+                        <div class="nk-header-wrap">
+                            <div class="nk-header-app-name">
+                                <img class="logo-img img-fluid me-3" style="max-width:170px;" src="{% static 'images/iqvialogo.png' %}" srcset="{% static 'images/iqvialogo.png' %}" alt="logo">
+                                <div class="nk-header-app-info ms-4">
+                                    <span class="sub-text">OCE Editor</span>
+                                    <span class="lead-text">{{pre.name}}</span>
+                                </div>
+                            </div>
+                            <div class="nk-header-tools d-flex">
+                                <div class="d-flex">
+                                    <a href="#file-add-slide" class="btn btn-warning m-2 px-4" data-bs-toggle="modal"><span>+ Sekans Ekle</span></a>
+                                    <a href="#" class="dropdown-toggle mt-1" data-bs-toggle="dropdown">
+                                        <div class="" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Menü"><em class="icon ni ni-menu-alt mx-1 me-2 ms-2" style='font-size:25px;'></em></div>
+                                    </a>
+                                    <div class="dropdown-menu ">
+                                        <div class="dropdown-body">
+                                            <div class="nk-notification">
+                                                <div class="dropdown-foot d-flex justify-content-start">
+                                                    <em class="icon ni ni-file-docs"></em>
+                                                    <a href="{% url 'folders' %}" class='ms-2'>Klasörler</a>
+                                                </div>
+                                                <div class="dropdown-foot d-flex justify-content-start">
+                                                    <em class="icon ni ni-img"></em>
+                                                    <a href="{% url 'presentation_list' %}" class='ms-2'>Sunumlar</a>
+                                                </div>
+                                                <div class="dropdown-foot d-flex justify-content-start">
+                                                    <em class="icon ni ni-setting-alt"></em>
+                                                    <a href="{% url 'settings' %}" class='ms-2'>Ayarlar</a>
+                                                </div>
+                                            </div><!-- .nk-notification -->
+                                        </div><!-- .nk-dropdown-body -->
+                                    </div>
+                                </div>
+                                <ul class="nk-quick-nav">
+                                    <li class="dropdown help-dropdown">
+                                        <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
+                                            <div class=""><em class="icon icon-circle bg-success-dim ni ni-help"></em></div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end">
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title">SSS</span>
+                                            </div>
+                                            <div class="dropdown-body">
+                                                <div class="nk-help">
+                                                    <div class="dropdown-foot">
+                                                        <a href="#">Nasıl sekans eklerim?</a>
+                                                    </div>
+                                                    <div class="dropdown-foot">
+                                                        <a href="#">Sunumu OCE'ye nasıl gönderebilirim?</a>
+                                                    </div>
+                                                    <div class="dropdown-foot">
+                                                        <a href="#">bla bla</a>
+                                                    </div>
+                                                </div><!-- .nk-notification -->
+                                            </div><!-- .nk-dropdown-body -->
+                                            <div class="dropdown-foot dropdown-notification center">
+                                                <a href="#">Hepsini Görüntüle</a>
+                                            </div>
+                                        </div>
+                                    </li><!-- .dropdown -->
+                                    <li class="dropdown notification-dropdown">
+                                        <a href="#" class="dropdown-toggle nk-quick-nav-icon notification-toggle" data-bs-toggle="dropdown">
+                                            <div class=""><em class="icon icon-circle ni ni-bell"></em></div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end">
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title">BİLDİRİMLER</span>
+                                            </div>
+                                            <div class="dropdown-body">
+                                                <div class="nk-notification">
+                                                    <div id="notification-panel">
+                                                        <!-- Notifications will be dynamically added here -->
+                                                    </div>
+                                                </div>
+                                            </div><!-- .nk-dropdown-body -->
+                                        </div>
+                                    </li><!-- .dropdown -->                                 
+                                    <li class="dropdown user-dropdown">
+                                        <a href="#" class="dropdown-toggle me-n1" data-bs-toggle="dropdown">
+                                            <div class="user-toggle">
+                                                <div class="user-avatar sm">
+                                                    <img class="logo-img img-fluid" style="max-width:170px;" src="{% if user.company.logo %}{{ user.company.logo.url }}{% else %}{% static 'images/company_logo.png' %}{% endif %}" alt="logo">
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end">
+                                            <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
+                                                <div class="user-card">
+                                                    <div class="user-avatar">
+                                                        <span>{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+                                                    </div>
+                                                    <div class="user-info">
+                                                        <span class="lead-text">{{ user.company.name }}</span>
+                                                        <span class="sub-text">{{ user.first_name }} {{ user.last_name }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="{% url 'settings' %}"><em class="icon ni ni-setting-alt"></em><span>Ayarlar</span></a></li>
+                                                    <li><a id="darkModeLink" class="dark-switch"><em class="icon ni ni-moon"></em><span>Koyu Tema</span></a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="{% url 'logout' %}"><em class="icon ni ni-signout"></em><span>Çıkış Yap</span></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- content @s -->
+                <div class="nk-content p-0">
+                    <div class="nk-content-inner">
+                        <div class="nk-content-body">
+                            <div class="nk-fmg">
+                                <div class="nk-fmg-aside">
+                                    <div class="nk-fmg-aside-wrap">
+                                        <div id='sliderAside' class="nk-fmg-aside-top pb-5">
+                                            <div class="sticky-top p-4 pb-3 bg-white pushtop" style=" left:20px;">
+                                                <h5 class="text-center">Sekanslar</h5>
+                                                <button id="toggleFullPageBtn" title='Full Page' class='icon ni ni-arrow-right-c'></button>
+                                            </div>
+                                            <ul class="nk-fmg-menu" id="sortable" style="max-width: 260px;">
+                                                {% for a in assets %}
+                                                <li title="{{ a.name }}" class='card-li' data-seqid="{{ a.id }}" data-url="{{a.img.url}}" data-name="{{a.name}}" {% comment %} data-start="{{a.activation_date|date:'d-m-Y'}}" data-end="{{a.deactivation_date|date:'d-m-Y'}}" {% endcomment %} id="{{a.id}}" >
+                                                    <div class="card card-bordered mt-1 mb-2" >
+                                                        <img src="{{a.img_url}}" class="card-img-top" alt="">
+                                                        <div class="card-inner card-inner1 p-1 pl-2">
+                                                            <p id='cardText{{a.id}}' class="card-text card-text1">
+                                                                  {{ a.name }}
+                                                            </p>                                                            
+                                                            <em class="icon ni ni-trash delete-cards" data-pk='{{a.id}}'  data-seqid="{{ a.id }}" data-url="{{a.img.url}}" data-name="{{a.name}}" {% comment %} data-start="{{a.activation_date|date:'d-m-Y'}}" data-end="{{a.deactivation_date|date:'d-m-Y'}}" {% endcomment %}></em>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        
+                                    </div>
+                                </div><!-- .nk-fmg-aside -->
+                                <div class="nk-fmg-body">
+
+                                    <div class="nk-fmg-body-content">
+                                        <div class="framephoto" id="containment-wrapper">
+                                            <div id="container" class='d-flex justify-content-center align-items-center' style="width:100%;height:100%;">
+                                                <div id="draggable">
+                                                    <p class="text-white larger">Alanı Seçiniz</p>
+                                                </div>
+                                                {% if firstAsset.img.url != null%}
+                                                    <img id='bigimage' data-active="" src="{{firstAsset.img.url}}" alt="" style="z-index: 20;">
+                                                {% else %}
+                                                    <img id='bigimage' data-active="false" src="{% static 'images/NoImage.jpg' %}" alt="" style="z-index: 20;">
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div><!-- .nk-fmg-body-content -->
+                                </div><!-- .nk-fmg-body -->
+                                <div class="nk-fmg-aside-right mt-5">
+                                    <div class="nk-fmg-aside-wrap">
+                                        <div class="nk-fmg-aside-top m-auto mt-4">
+                                            <div class="card card-bordered card-stretch" style="border:none;">
+                                                <ul class="nav nav-tabs nav-tabs-mb-icon nav-tabs-card">
+                                                    <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="left" title="Ayarlar">
+                                                        <a class="nav-link active" data-bs-toggle="tab" href="#settings"><em class="icon ni ni-setting-alt"></em></a>
+                                                    </li>
+                                                    <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="left" title="Link Ekle">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#link"><em class="icon ni ni-link"></em></a>
+                                                    </li>
+                                                    <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="left" title="Pop-up Ekle">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#popup"><em class="icon ni ni-expand"></em></a>
+                                                    </li>
+                                                    <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="left" title="Video Ekle">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#url"><em class="icon ni ni-video"></em></a>
+                                                    </li>
+                                                </ul>
+                                                <div class="tab-content" style="min-height: 450px;">
+                                                    <div class="tab-pane active" id="settings">
+                                                        <div class="card-inner pt-0">
+                                                            <div class="card-head">
+                                                                <h5 class="card-title">Sekans Bilgileri</h5>
+                                                            </div>
+                                                            
+                                                            <form action="#">
+                                                                <div class="form-group">
+                                                                    <label class="form-label">Sekans Adı</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" class="form-control form-control-sm" data-pk="{{firstAsset.id}}" id="sequencename" value="{{firstAsset.name}}">
+                                                                    </div>
+                                                                </div>
+                                                                {% comment %} <div class="form-group">
+                                                                    <label class="form-label">Start Date</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <div class="form-icon form-icon-right">
+                                                                            <em class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
+                                                                        <input type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy" class="form-control form-control-sm date-picker" id='assetStart' value={{firstAsset.activation_date|date:'d-m-Y'}}>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="form-label">End Date</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <div class="form-icon form-icon-right">
+                                                                            <em class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
+                                                                        <input type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy" class="form-control form-control-sm date-picker" id='assetEnd' value={{firstAsset.deactivation_date|date:'d-m-Y'}}>
+                                                                    </div>
+                                                                </div> {% endcomment %}
+                                                                <div class="form-group">
+                                                                    <div class="d-flex">
+                                                                        <a  class="btn btn-sm btn-primary m-auto" data-id={{firstAsset.id}} id='addProductBtn' style="width: 200px;" data-bs-toggle="modal"><span>Ürün / Mesaj Ekle</span></a>                                                                    </div>
+                                                                    </div>
+                                                                    <div class="d-flex">
+                                                                        <button class="btn btn-sm btn-success m-auto" style="width: 200px;" id='savesequenceinfo'><span>Kaydet</span></button>                    
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                      
+                                                    </div><!--tab pan -->
+                                                    <div class="tab-pane" id="link">
+                                                        <div class="card-inner pt-0">
+                                                            <div class='text-center mb-2' style='position:relative;'>
+                                                                <p data-name="{{firstAsset.name}}" data-pk="{{firstAsset.id}}" class='sequencenametabs'>{{firstAsset.name}}</p>
+                                                            </div>
+                                                            <button class="btn btn-primary btn-sm mb-3 visibleDrag" style="width: 200px;"><span class="m-auto">+ Sekans Linki Ekle</span></button>
+                                                            <div class="form-group">
+                                                                <div class="custom-control custom-switch mt-2">                                                                                                                                                                                                                
+                                                                    <input type="checkbox" class="custom-control-input customSwitchLink" id="customSwitch1">
+                                                                    <label class="custom-control-label" for="customSwitch1">Tüm Sekanslar?</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="form-label" id='chooseSlide'>Sekans Seçiniz</label>
+                                                                <div class="form-control-wrap" style="width: 200px;">
+                                                                    <select id='slideSelect' class="form-select js-select2" data-search="on" data-ui="sm">
+                                                                        <option value="default_option">Sekans Seçiniz</option>
+                                                                        {% for a in assets %}
+                                                                        <option value="{{a.id}}">{{a.name}}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <hr>
+                                                            <button id="saveLink" class="btn btn-success btn-sm mb-2" style="width: 200px;"><span class="m-auto">Kaydet</span></button>
+                                                            <ul id="slideLinkInfo" style="width: 210px;max-height:150px; overflow-y:auto; padding-right:2px;position:relative;">
+
+                                                            </ul>
+                                                        </div>
+                                                    </div><!--tab pan -->
+                                                    <div class="tab-pane" id="popup">
+                                                        <div class="card-inner pt-0">
+                                                            <div class='text-center mb-2' style='position:relative;'>
+                                                                <p data-name="{{firstAsset.name}}" data-pk="{{firstAsset.id}}" class='sequencenametabs'>{{firstAsset.name}}</p>
+                                                            </div>
+                                                            <button class="btn btn-primary btn-sm mb-3 visibleDrag" style="width: 200px;"><span class="m-auto">+ Pop-up Ekle</span></button>
+                                                            <div class="form-group">
+                                                                <label class="form-label">Popup Yükle</label>
+                                                                <div class="form-control-wrap">
+                                                                    <div class='form-file' style="width: 200px;" >
+                                                                        <input type="file" accept="image/*" class="form-control form-file-input" name='slideInput' id='slideInput'>
+                                                                        <label class='form-file-label' for='customFile'>Seçiniz</label>
+                                                                    </div>
+                                                                </div>
+                                                            <hr>
+                                                            </div>
+                                                            <button id="savePopUp" class="btn btn-success btn-sm mb-2" style="width: 200px;"><span class="m-auto">Kaydet</span></button>
+                                                            <ul id="slidePopupInfo" style="width: 210px;max-height:150px; overflow-y:auto; padding-right:2px;position:relative;">
+
+                                                            </ul>
+                                                            
+                                                        </div>
+                                                    </div><!--tab pan -->
+                                                    <div class="tab-pane" id="url">
+                                                        <div class="card-inner pt-0">
+                                                            <div class='text-center mb-2' style='position:relative;'>
+                                                                <p data-name="{{firstAsset.name}}" data-pk="{{firstAsset.id}}" class='sequencenametabs'>{{firstAsset.name}}</p>
+                                                            </div>
+                                                            <button class="btn btn-primary btn-sm mb-3 visibleDrag" style="width: 200px;"><span class="m-auto">+ Video Ekle</span></button>
+                                                            <div class="form-group">
+                                                                <div class="custom-control custom-switch mt-2">                                                                                                                                                                                                                
+                                                                    <input type="checkbox" class="custom-control-input customSwitchVideo" id="customSwitch2">
+                                                                    <label class="custom-control-label" for="customSwitch2">Seçili Alan?</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="form-label">Video Yükle</label>
+                                                                <div class="form-control-wrap">
+                                                                    <div class='form-file' style="width: 200px;">
+                                                                        <input style="width: 200px;" type="file" accept="video/*" class="form-control form-file-input" name='customFile' id='videoInput'>
+                                                                        <label class='form-file-label' for='customFile'>Video Seç</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr>
+                                                            <button id="saveVideo" class="btn btn-success btn-sm mb-2" style="width: 200px; "><span class="m-auto">Kaydet</span></button>
+                                                            <ul id="slideVideoInfo" style="width: 210px;max-height:150px; overflow-y:auto; padding-right:2px;position:relative;">
+
+                                                            </ul>
+                                                        </div>
+                                                    </div><!--tab pan -->
+                                                </div><!-- .tab-content -->
+                                            </div><!--card-->
+                                        </div>
+                                    </div>
+                                </div><!-- .nk-fmg-aside -->
+                            </div><!-- .nk-fmg -->
+                        </div>
+                    </div>
+                </div>
+                <!-- content @e -->
+            </div>
+            <!-- wrap @e -->
+        </div>
+        <!-- main @e -->
+    </div>
+    <div id="closable-div" class='bg-success'>
+        <div class="close-button-container">
+            <button class="close-button">x</button>
+        </div>
+        <p id='coordText'></p>
+    </div>
+    <!-- app-root @e -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="file-product">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-center border-bottom-0">
+                    <h5 class="modal-title">Ürün / Mesaj Ekle</h5>
+                    <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                </div>
+                <div class="modal-body pt-0 mt-n2">
+                    <div class="nk-fmg-listing is-scrollable">
+                        <div class="nk-files nk-files-view-list is-compact">
+                            <div class="nk-files-list">
+                                <div id="accordion" class="accordion">
+                                    <div class="modal-body pt-0 mt-n2">
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <h5 class='mt-4 mb-2'>Ürünler</h5>
+                                                <div id="product-list">
+                                                    <ul style='max-height:150px;overflow-y:auto;'>
+                                                        {% for product in products %}
+                                                        <li class='d-flex product-item' data-product-id="{{ product.id }}" style='cursor:pointer;'>
+                                                            <p class="title col-8 ms-3 mt-2">{{ product.name }}</p>
+                                                            <input style='margin-top:-5px;' type="checkbox" id="customCheck-{{ product.id }}">
+                                                            {% if product.is_active != True %}
+                                                                <em class="icon ni ni-alert mt-2" style='color:red; font-size:20px; margin-left:10px;' data-toggle="tooltip" data-placement="top" title='Bu Ürün OCE Web Üzerinden Aktif edilmelidir'></em>
+                                                            {% endif %}
+
+                                                        </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <h5 class='mt-4 mb-2'>Mesajlar</h5>
+                                                <ul id="message-list" style='max-height:150px;overflow-y:auto;'>
+                                                    {% for message in messages %}
+                                                    <li class="d-flex justify-content-between message-item d-none message-product-{{message.product.id}} "  data-product-id="{{ message.product.id }}">
+                                                        <p class="title col-8 ms-3 mt-2">{{ message.name }}</p>
+                                                        <input style='margin-top:-5px; margin-right:10px;' type="checkbox" id="messageCheck-{{ message.id }}">
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            <div class="col-4">
+                                                <h5 class='mt-4 mb-2'>Kayıtlı Olanlar</h5>
+                                                <div id='savedProduct'></div>
+                                                <div id='savedMessages' class='mt-5'></div>
+                                            </div>
+                                        </div>
+                                    </div><!-- .modal-body -->
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .modal-body -->
+                <div class="modal-footer modal-footer-stretch bg-light">
+                    <div class="modal-footer-between">
+                        <div class="g ms-auto">
+                            <ul class="btn-toolbar g-3 ">
+                                <li><a target='_blank' href="https://abdiibrahim-cis-oce--fordeleted.sandbox.lightning.force.com/one/one.app#eyJjb21wb25lbnREZWYiOiJPQ0U6QWRtaW5TZWN0aW9uIiwiYXR0cmlidXRlcyI6eyJ0cmVlSnNvbiI6W3siYXR0cmlidXRlTmFtZUZvckpzb25QYXJhbXMiOiIiLCJjb21wb25lbnROYW1lIjoiT0NFOlByb2R1Y3RzU2V0dXAiLCJqc29uUGFyYW1zIjoiIiwibGFiZWwiOiJQcm9kdWN0IEhpZXJhcmNoeSIsIm5vZGVJZCI6IlByb2R1Y3RzX0FsaWdubWVudCIsIm5vZGVzIjpbXSwicGFyZW50VGl0bGUiOiJQcm9kdWN0cyIsInNlYXJjaExhYmVsIjoiUHJvZHVjdCBIaWVyYXJjaHkifSx7ImF0dHJpYnV0ZU5hbWVGb3JKc29uUGFyYW1zIjoiIiwiY29tcG9uZW50TmFtZSI6Ik9DRTpQcm9kdWN0c1RlcnJpdG9yaWVzQWxpZ25tZW50U2V0dXAiLCJqc29uUGFyYW1zIjoiIiwibGFiZWwiOiJQcm9kdWN0IEFsaWdubWVudCIsIm5vZGVJZCI6IlByb2R1Y3RzX3RvX1RlcnJpdG9yaWVzX0FsaWdubWVudCIsIm5vZGVzIjpbXSwicGFyZW50VGl0bGUiOiJQcm9kdWN0cyIsInNlYXJjaExhYmVsIjoiUHJvZHVjdCBBbGlnbm1lbnQifSx7ImF0dHJpYnV0ZU5hbWVGb3JKc29uUGFyYW1zIjoiIiwiY29tcG9uZW50TmFtZSI6Ik9DRTpQcm9kdWN0UmVzdHJpY3Rpb25zSm9iTWFuYWdlbWVudCIsImpzb25QYXJhbXMiOiIiLCJsYWJlbCI6IlByb2R1Y3QgUmVzdHJpY3Rpb25zIEpvYnMiLCJub2RlSWQiOiJQcm9kdWN0X1Jlc3RyaWN0aW9uc19Kb2JzIiwibm9kZXMiOltdLCJwYXJlbnRUaXRsZSI6IlByb2R1Y3RzIiwic2VhcmNoTGFiZWwiOiJQcm9kdWN0IFJlc3RyaWN0aW9ucyBKb2JzIn0seyJhdHRyaWJ1dGVOYW1lRm9ySnNvblBhcmFtcyI6IiIsImNvbXBvbmVudE5hbWUiOiJPQ0U6UHJvZHVjdFNoYXJpbmdKb2JzIiwianNvblBhcmFtcyI6IiIsImxhYmVsIjoiUHJvZHVjdCBTaGFyaW5nIEpvYnMiLCJub2RlSWQiOiJQcm9kdWN0U2hhcmluZ0pvYnMiLCJub2RlcyI6W10sInBhcmVudFRpdGxlIjoiUHJvZHVjdHMiLCJzZWFyY2hMYWJlbCI6IlByb2R1Y3QgU2hhcmluZyBKb2JzIn0seyJhdHRyaWJ1dGVOYW1lRm9ySnNvblBhcmFtcyI6IiIsImNvbXBvbmVudE5hbWUiOiJPQ0U6dGVycml0b3J5UHJvZHVjdHMiLCJqc29uUGFyYW1zIjoiIiwibGFiZWwiOiJUZXJyaXRvcnkgUHJvZHVjdHMiLCJub2RlSWQiOiJUZXJyaXRvcnlfUHJvZHVjdHMiLCJub2RlcyI6W10sInBhcmVudFRpdGxlIjoiUHJvZHVjdHMiLCJzZWFyY2hMYWJlbCI6IlRlcnJpdG9yeSBQcm9kdWN0cyJ9XX0sInN0YXRlIjp7fX0%3D" class="btn btn-warning">OCE'de Yeni Ürün Oluştur</a></li>
+                                <li><a href="#" data-bs-dismiss="modal" class="btn btn-outline-light btn-white">İptal</a></li>
+                                <li><a href="#" class="btn btn-success" onclick="saveProductMessages()">Kaydet</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div><!-- .modal-footer -->
+            </div><!-- .modal-content -->
+        </div><!-- .modal-dialog -->
+    </div>
+    <!-- .modal -->
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="file-add-slide">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                <div class="modal-body modal-body-md">
+                    <div class="nk-upload-form">
+                        <h5 class="title mb-3">Sekans Yükle</h5>
+                        <div class="upload-zone small bg-lighter">
+                            <div class="dz-message" data-dz-message>
+                                <span class="dz-message-text">Fotoğrafları <span>Sürükle/Bırak</span> veya <br> <span>Bilgisayardan Tara</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nk-modal-action justify-end">
+                        <ul class="btn-toolbar g-4 align-center">
+                            <li><a href="#" data-bs-dismiss="modal" class="btn btn-outline-light btn-white">İptal</a></li>
+                            <li><a href="{% url 'edit' pre.id %}" class="btn btn-success">Kaydet</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div><!-- .modal-content -->
+        </div><!-- .modla-dialog -->
+    </div><!-- .modal -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="delete-modal">
+        <div class="modal-dialog modal-md" role="document">
+          <div class="modal-content">
+            <div class="modal-header align-center">
+              <div class="nk-file-title">
+                <div class="nk-file-icon">
+                  <span class="nk-file-icon-type">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+                        <path d="M49,61H23a5.0147,5.0147,0,0,1-5-5V16a5.0147,5.0147,0,0,1,5-5H40.9091L54,22.1111V56A5.0147,5.0147,0,0,1,49,61Z" style="fill:#e3edfc" />
+                        <path d="M54,22.1111H44.1818a3.3034,3.3034,0,0,1-3.2727-3.3333V11s1.8409.2083,6.9545,4.5833C52.8409,20.0972,54,22.1111,54,22.1111Z" style="fill:#b7d0ea" />
+                        <path d="M19.03,59A4.9835,4.9835,0,0,0,23,61H49a4.9835,4.9835,0,0,0,3.97-2Z" style="fill:#c4dbf2" />
+                        <path d="M27.2223,43H44.7086s2.325-.2815.7357-1.897l-5.6034-5.4985s-1.5115-1.7913-3.3357.7933L33.56,40.4707a.6887.6887,0,0,1-1.0186.0486l-1.9-1.6393s-1.3291-1.5866-2.4758,0c-.6561.9079-2.0261,2.8489-2.0261,2.8489S25.4268,43,27.2223,43Z" style="fill:#755de0" />
+                    </svg>
+                  </span>
+                </div>
+                <div class="nk-file-name">
+                  <div class="nk-file-name-text"><span class="title">Silmeyi Onayla - <span id="item-name"></span></span></div>
+                </div>
+              </div>
+              <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            </div>
+            <div class="modal-body p-0">
+              <div class="nk-file-share-header">
+                <div class="nk-file-share-group">
+                  <div class="nk-file-share-input-group">
+                    <div class="nk-file-share-input">
+                      <p>Silmek istediğinize emin misiniz? <span id="item-name2"></span>?</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer bg-light">
+              <ul class="btn-toolbar g-3">
+                <li><button class="btn btn-outline-light btn-white" data-bs-dismiss="modal">İptal</button></li>
+                <li><button class="btn btn-danger" id="delete-btn">Sil</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/bundle.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/jquery-3.6.0.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+
+    <!--Dropzone İnit Function-->
+    <script>
+        NioApp.Dropzone.init = function () {
+            NioApp.Dropzone('.upload-zone', {
+              url: "/uploadimagesedit/{{pre.id}}",
+              autoProcessQueue:true,
+              acceptedFiles: 'image/*',
+            });
+          };
+    </script>
+    <!--Dropzone İnit Function-->
+
+    <!--Draggable Functions-->
+    <script>
+        $( function() {
+            $( "#draggable" ).draggable({ 
+                containment: "#containment-wrapper", 
+                scroll: false,
+            });
+          } );
+        
+        $( function() {
+            $( "#draggable" ).resizable({
+                containment: "#container",
+                minHeight: 50,
+                minWidth: 100,
+                scroll: false,
+                handles: 'n, e, s, w, se, ne, sw, nw'
+            });
+        } );
+        
+        $(document).ready(function () {
+            $(".visibleDrag").click(function () {
+                $("#draggable").css("display", "flex");
+            });
+        });
+    </script>
+    <!--Draggable Functions-->
+
+    <!--Sortable Elements data save with ajax-->
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            $( "#sortable").sortable({
+             update: function(event, ui) {
+                sort =[];
+                window.CSRF_TOKEN = "{{ csrf_token }}";
+                $("#sortable").children().each(function(){
+                    sort.push({'pk':$(this).data('seqid'),'order':$(this).index()})
+            });
+            $.ajax({
+              url: "{% url "asset_sort" %}",
+              type: "post",
+              datatype:'json',
+              data:{'sort':JSON.stringify(sort),
+               'csrfmiddlewaretoken': window.CSRF_TOKEN
+              },
+    
+            });
+             console.log(sort)
+              },
+            }).disableSelection();
+            });
+    </script>
+    <!--Sortable Elements data save with ajax-->
+
+    <!--Sortable Elements onClick / Write relevant data to AsideRightMenu-->
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            var $sortable = $("#sortable");
+            var $bigimage = $("#bigimage");
+            var $sequencename = $("#sequencename");
+            /*
+            var $assetStart = $('#assetStart');
+            var $assetEnd = $('#assetEnd');
+            */
+            var $sequencenametabs = $(".sequencenametabs");
+            var $slideSelect = $("#slideSelect"); 
+            var $addProBtn = $("#addProductBtn"); 
+                
+            $sortable.on('click','li', function() {
+                var $this = $(this);
+                $bigimage.attr('src', $this.attr("data-url"));
+                $sequencename.attr('data-pk', $this.attr("data-seqid"));
+                $sequencenametabs.html($this.attr("data-name"));
+                $sequencenametabs.attr('data-name', $this.attr("data-name"));
+                $sequencenametabs.attr('data-pk', $this.attr("data-seqid"));
+                $addProBtn.attr('data-id', $this.attr("data-seqid"));
+                console.log($this.attr("data-seqid"));
+                console.log($addProBtn.attr('data-id'));
+                /*
+                $assetStart.val('');
+                $assetEnd.val('');
+                */
+                $sequencename.val('');
+                $slideSelect.val("default_option");
+        
+                // Set Start Date field to placeholder value if data-start attribute is "dd-mm-yyyy"
+                /*
+                if ($this.attr("data-start") == "") {
+                    $assetStart.val("");
+                    $assetStart.attr("placeholder", "dd-mm-yyyy");
+                } else {
+                    $assetStart.val($this.attr("data-start"));
+                }
+                        
+                // Set End Date field to placeholder value if data-end attribute is "dd-mm-yyyy"
+                if ($this.attr("data-end") == "") {
+                    $assetEnd.val("");
+                    $assetEnd.attr("placeholder", "dd-mm-yyyy");
+                } else {
+                    $assetEnd.val($this.attr("data-end"));
+                }
+                */
+                $sequencename.val($this.attr("data-name"));
+
+                var asset_id = $this.attr("data-seqid");
+                getAssetCoords(asset_id);
+            });
+        });
+    </script>
+    <!--Sortable Elements onClick / Write relevant data to AsideRightMenu-->
+
+     <!--Sortable Elements onClick / Write relevant data to Other Tabs-->
+    <script type="text/javascript" charset="utf-8">
+        function getAssetCoords(assetId) {
+            // Make an AJAX request to retrieve the asset coordinates for the given asset id
+            $.ajax({
+                url: '/get/asset-coordinates/?asset_id=' + assetId,
+                type: 'GET',
+                success: function(response) {
+                    const assetCoords = response;
+                    // Handle the asset coordinates here
+                    // For example, you can update the values of some HTML elements with the coordinate data
+                    const linkTab = $('#slideLinkInfo');
+                    const popupTab = $('#slidePopupInfo');
+                    const videoTab = $('#slideVideoInfo');
+                    
+                    // Clear any previous data from the HTML elements
+                    linkTab.empty();
+                    popupTab.empty();
+                    videoTab.empty();
+                    
+                    // Loop through each asset coordinate object and append the data to the appropriate HTML elements based on the coordinate type
+                    for (const assetCoord of assetCoords) {
+                        if (assetCoord.coordinate_type === "link") {
+                            linkTab.append('<li onclick="showCoordinate(' + assetCoord.start_top + ',' + assetCoord.start_left + ',' + assetCoord.end_top + ',' + assetCoord.end_left + ',' + "'" + assetCoord.coordinate_type + "'" + ',' + false + ',' + assetCoord.isEveryLink + ')" class="d-flex justify-content-between AcList" data-id="' + assetCoord.id + '"> ' + '<p style="max-width:170px;">' + assetCoord.linked_asset_name + '</p>' + '<button style="color:red;font-size:20px;font-weight:800; margin-top:-1.3rem; display:block; border:none;background:none;" onclick="event.stopPropagation(); deleteAcCord(' + assetCoord.id + ')">x</button> </li>');
+                        } else if (assetCoord.coordinate_type === "popup") {
+                            popupTab.append('<li onclick="showCoordinate(' + assetCoord.start_top + ',' + assetCoord.start_left + ',' + assetCoord.end_top + ',' + assetCoord.end_left + ',' + "'" + assetCoord.coordinate_type + "'" + ',' + false + ',' + false + ')" class="d-flex justify-content-between AcList" data-id="' + assetCoord.id + '"> ' + '<p style="max-width:170px;">' + assetCoord.image.replace('/media/popups/', '') + '</p>' + '<button style="color:red;font-size:20px;font-weight:800; margin-top:-1.3rem; display:block; border:none;background:none;" onclick="event.stopPropagation(); deleteAcCord(' + assetCoord.id + ')">x</button> </li>');
+                        } else if (assetCoord.coordinate_type === "video") {
+                            videoTab.append('<li onclick="showCoordinate(' + assetCoord.start_top + ',' + assetCoord.start_left + ',' + assetCoord.end_top + ',' + assetCoord.end_left + ',' + "'" + assetCoord.coordinate_type + "'" + ',' + assetCoord.is_embedded + ',' + false + ')" class="d-flex justify-content-between AcList" data-id="' + assetCoord.id + '"> ' + '<p style="max-width:170px;">' + assetCoord.video.replace('/media/videos/', '') + '</p>' + '<button style="color:red;font-size:20px;font-weight:800; margin-top:-1.3rem; display:block; border:none;background:none;" onclick="event.stopPropagation(); deleteAcCord(' + assetCoord.id + ')">x</button> </li>');
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    // Handle any errors that occur during the AJAX request
+                    console.log('Error retrieving asset coordinates: ' + xhr.statusText);
+                }
+            });
+        }
+        
+    </script>
+    <!--Sortable Elements onClick / Write relevant data to Other Tabs-->
+
+    <!--Sequence Info Data save With Ajax(AsideRightMenu)-->
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            $("#savesequenceinfo").click(function(){
+                event.preventDefault();
+                window.CSRF_TOKEN = "{{ csrf_token }}";
+                related_li_id = '#' + $('#sequencename').attr('data-pk');
+                var seq = {
+                    'pk': $('#sequencename').attr('data-pk'),
+                    'name': $('#sequencename').val(),
+                    /*
+                    'start': $('#assetStart').val(),
+                    'end': $('#assetEnd').val()
+                    */
+                };
+                if (!seq['name']) {
+                    alert("Sequence Name cannot be empty");
+                    return;
+                }
+                $.ajax({
+                    url: "{% url 'save_sequence_info' %}", // Correct URL format for Django template tag
+                    type: "post",
+                    dataType: 'json', // Correct option name
+                    data: {
+                        'seq': JSON.stringify(seq),
+                        'csrfmiddlewaretoken': window.CSRF_TOKEN
+                    },
+                });
+                $(related_li_id).attr('data-name', $('#sequencename').val());
+                /*
+                $(related_li_id).attr('data-start', $('#assetStart').val());
+                $(related_li_id).attr('data-end', $('#assetEnd').val());
+                */
+                $(related_li_id).attr('title', seq['name']);
+    
+                related_p_id = '#cardText' + $('#sequencename').attr('data-pk');
+                $(related_p_id).text(seq['name']);
+                $(".sequencenametabs").html(seq['name']);
+                $(".sequencenametabs").attr('data-name', seq['name']);
+
+            });
+        });
+    </script>
+    <!--Sequence Info Data save With Ajax(AsideRightMenu)-->
+
+    <!--Save LİNK data to db with ajax , Area Choose and get coordinates(percent base)-->
+    <script>
+        var slideData = [];
+        $(document).ready(function () {
+            $("#saveLink").click(function () {
+                window.CSRF_TOKEN = "{{ csrf_token }}";
+                var selectedOptionValue = $("#slideSelect").val();
+                var selectedOptionName = $("#slideSelect option:selected").text(); // Retrieve the selected option's text, which is the name
+                var everyLinkSwitch = document.getElementsByClassName("customSwitchLink");
+                var isEveryLink = everyLinkSwitch[0].checked;
+                console.log("Selected Option Value: " + selectedOptionValue);
+                console.log("Selected Option Name: " + selectedOptionName);
+                console.log($("#draggable").is(":visible"));
+                if ($("#draggable").is(":visible") && selectedOptionValue !== "default_option") {
+                    // Get the position of the draggable element
+                    const little = $('#draggable')[0];
+                    const contain = $('#containment-wrapper')[0];
+                    const containerRect = contain.getBoundingClientRect();
+                    const parentWidth = containerRect.width;
+                    const parentHeight = containerRect.height;
+                    const startTop = Math.round(((little.offsetTop - containerRect.top) / parentHeight) * 100000);
+                    const startLeft = Math.round(((little.offsetLeft - containerRect.left) / parentWidth) * 100000);
+                    const endTop = Math.round(((little.offsetTop + little.offsetHeight - containerRect.top) / parentHeight) * 100000);
+                    const endLeft = Math.round(((little.offsetLeft + little.offsetWidth - containerRect.left) / parentWidth) * 100000);
+
+                    const assetId =$('#sequencename').attr('data-pk')
+                    const coordinate_type = "link"
+                    console.log(startTop);
+                    $("#draggable").css("display", "none");
+                    const data = {
+                        'start_top': startTop,
+                        'start_left': startLeft,
+                        'end_top': endTop,
+                        'end_left': endLeft,
+                        'coordinate_type':  coordinate_type,  // Assuming you have the selectedOptionValue value available
+                        'asset_id': assetId,  // Assuming you have the assetId value available for the ForeignKey field
+                        'linked_asset_id' : selectedOptionValue,
+                        'isEveryLink' : isEveryLink,
+                        'csrfmiddlewaretoken': window.CSRF_TOKEN,
+                      };
+                    $.ajax({
+                        url: "{% url 'save_link' %}",  // Replace with the URL endpoint for your view
+                        type: 'POST',
+                        data: data,
+                        dataType: 'json',
+                        success: function(response) {
+                          // Handle success response, if needed
+                          console.log('Data saved successfully:', response);
+                          getAssetCoords(assetId);
+                        },
+                        error: function(xhr, textStatus, errorThrown) {
+                          // Handle error response, if needed
+                          console.error('Error saving data:', errorThrown);
+                        }
+                      });
+                } else {
+                    var alertMessage = "";
+                    if (!$("#draggable").is(":visible")) {
+                        alertMessage += "Please choose an area. ";
+                    }
+                    if (selectedOptionValue === "default_option" && $("#draggable").is(":visible")) {
+                        alertMessage += "Please choose a slide.";
+                    }
+                    if (alertMessage !== "") {
+                        alert(alertMessage); // Show an alert indicating that an area or slide must be chosen before saving
+                        $("#draggable").css("display", "none");
+                    }
+                }
+            });
+
+        });
+    </script>
+    <!--Save LİNK data to db with ajax , Area Choose and get coordinates(percent base)-->
+
+    <!-- Save POPUP data to db with ajax , Area Choose and get coordinates(percent base)-->
+    <script>
+        // Add event listener for when the submit button is clicked
+        $("#savePopUp").on("click", function(event) {
+            window.CSRF_TOKEN = "{{ csrf_token }}";
+            var fileInput = document.getElementById("slideInput");
+            var file = fileInput.files[0];
+            var assetId = $('#sequencename').attr('data-pk'); // Get assetId from DOM
+            if ($("#draggable").is(":visible") && file) {
+                // Get the position of the draggable element
+                const little = $('#draggable')[0];
+                const contain = $('#containment-wrapper')[0];
+                const containerRect = contain.getBoundingClientRect();
+                const parentWidth = containerRect.width;
+                const parentHeight = containerRect.height;
+                const startTop = Math.round(((little.offsetTop - containerRect.top) / parentHeight) * 100000);
+                const startLeft = Math.round(((little.offsetLeft - containerRect.left) / parentWidth) * 100000);
+                const endTop = Math.round(((little.offsetTop + little.offsetHeight - containerRect.top) / parentHeight) * 100000);
+                const endLeft = Math.round(((little.offsetLeft + little.offsetWidth - containerRect.left) / parentWidth) * 100000);
+                const coordinate_type = "popup"
+                console.log(startTop);
+                $("#draggable").css("display", "none");
+    
+                // Create FormData object and append file to it
+                var formData = new FormData();
+                formData.append('file', file);
+                formData.append('start_top', startTop);
+                formData.append('start_left', startLeft);
+                formData.append('end_top', endTop);
+                formData.append('end_left', endLeft);
+                formData.append('coordinate_type', coordinate_type);
+                formData.append('asset_id', assetId);
+                formData.append('csrfmiddlewaretoken', window.CSRF_TOKEN);
+    
+                $.ajax({
+                    url: "{% url 'save_popup' %}",
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Handle success response, if needed
+                        console.log('Data saved successfully:', response);
+                        getAssetCoords(assetId);
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        // Handle error response, if needed
+                        console.error('Error saving data:', errorThrown);
+                    }
+                });
+            } else {
+                var alertMessage = "";
+                if (!$("#draggable").is(":visible")) {
+                    alertMessage += "Please choose an area. ";
+                }
+                if (!file && $("#draggable").is(":visible")) {
+                    alertMessage += "Please upload a popup.";
+                }
+                if (alertMessage !== "") {
+                    alert(alertMessage); // Show an alert indicating that an area or slide must be chosen before saving
+                    $("#draggable").css("display", "none");
+                }
+            }
+        });
+    </script>
+    <!-- Save POPUP data to db with ajax , Area Choose and get coordinates(percent base)-->
+
+  
+    <!-- Save VİDEO data to db with ajax , Area Choose and get coordinates(percent base)-->
+    <script>
+        // Add event listener for when the submit button is clicked
+        $("#saveVideo").on("click", function(event) {
+            window.CSRF_TOKEN = "{{ csrf_token }}";
+            var fileInput = document.getElementById("videoInput");
+            var file = fileInput.files[0];
+            var assetId = $('#sequencename').attr('data-pk'); // Get assetId from DOM
+            var embeddedSwitch = document.getElementsByClassName("customSwitchVideo");
+            var isEmbedded = embeddedSwitch[0].checked;
+            console.log(isEmbedded);
+            if ($("#draggable").is(":visible") && file) {
+                // Get the position of the draggable element
+                const little = $('#draggable')[0];
+                const contain = $('#containment-wrapper')[0];
+                const containerRect = contain.getBoundingClientRect();
+                const parentWidth = containerRect.width;
+                const parentHeight = containerRect.height;
+                const startTop = Math.round(((little.offsetTop - containerRect.top) / parentHeight) * 100000);
+                const startLeft = Math.round(((little.offsetLeft - containerRect.left) / parentWidth) * 100000);
+                const endTop = Math.round(((little.offsetTop + little.offsetHeight - containerRect.top) / parentHeight) * 100000);
+                const endLeft = Math.round(((little.offsetLeft + little.offsetWidth - containerRect.left) / parentWidth) * 100000);
+                const coordinate_type = "video"
+                console.log(startTop);
+                $("#draggable").css("display", "none");
+    
+                // Create FormData object and append file to it
+                var formData = new FormData();
+                formData.append('file', file);
+                formData.append('isEmbedded', isEmbedded);
+                formData.append('start_top', startTop);
+                formData.append('start_left', startLeft);
+                formData.append('end_top', endTop);
+                formData.append('end_left', endLeft);
+                formData.append('coordinate_type', coordinate_type);
+                formData.append('asset_id', assetId);
+                formData.append('csrfmiddlewaretoken', window.CSRF_TOKEN);
+    
+                $.ajax({
+                    url: "{% url 'save_video' %}",
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Handle success response, if needed
+                        console.log('Data saved successfully:', response);
+                        getAssetCoords(assetId);
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        // Handle error response, if needed
+                        console.error('Error saving data:', errorThrown);
+                    }
+                });
+            } else {
+                var alertMessage = "";
+                if (!$("#draggable").is(":visible")) {
+                    alertMessage += "Please choose an area. ";
+                }
+                if (!file && $("#draggable").is(":visible")) {
+                    alertMessage += "Please upload a video.";
+                }
+                if (alertMessage !== "") {
+                    alert(alertMessage); // Show an alert indicating that an area or slide must be chosen before saving
+                    $("#draggable").css("display", "none");
+                }
+            }
+        });
+    </script>
+    <!-- Save VİDEO data to db with ajax , Area Choose and get coordinates(percent base)-->
+
+
+    <!--Sortable Elements Full Page-->
+    <script>
+        // Toggle full-page mode when button is clicked
+        $("#toggleFullPageBtn").click(function() {
+            $("#sliderAside").toggleClass("full-page-mode");
+            $(".nk-fmg-aside-right").toggleClass("d-none");
+            if ($("#sliderAside").hasClass("full-page-mode")) {
+                // If full-page mode is enabled, change icon class to a different icon
+                $("#toggleFullPageBtn").removeClass("icon ni ni-arrow-right-c").addClass("icon ni ni-arrow-left-c");
+            } else {
+                // If full-page mode is disabled, change icon class back to the original icon
+                $("#toggleFullPageBtn").removeClass("icon ni ni-arrow-left-c").addClass("icon ni ni-arrow-right-c");
+            }
+        });
+    </script>
+    <!--Sortable Elements Full Page-->
+
+    <!--Delete Sortable Elements-->
+    <script>
+        const deleteButtons = document.querySelectorAll('.delete-cards');
+        const deleteModal = document.querySelector('#delete-modal');
+        const itemName = document.querySelector('#item-name');
+        const itemName2 = document.querySelector('#item-name2');
+        const deleteBtn = document.querySelector('#delete-btn');
+    
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const card = button.closest('.card-bordered');
+                const assetId = button.dataset.pk;
+                const name = button.dataset.name;
+                card.click();
+                // Update modal content with item details
+                itemName.textContent = name;
+                itemName2.textContent = name;
+                // Show the modal
+                deleteModal.classList.add('show');
+                deleteModal.style.display = 'block';
+                // Add event listener to delete button in modal
+                deleteBtn.addEventListener('click', function() {
+                // Send a DELETE request to the server using AJAX
+                    fetch(`/assets/${assetId}/delete`, {
+                        method: 'DELETE',
+                        headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                        // Remove the corresponding card from the page
+                        card.remove();
+                        // Close the modal
+                        deleteModal.classList.remove('show');
+                        deleteModal.style.display = 'none';
+                        // Check if there are any remaining cards
+                        const firstCard = document.querySelector(".card-li:first-of-type");
+                        var $bigimage = $("#bigimage");
+                        if (firstCard) {
+                            firstCard.click();
+                        } else {
+                            $bigimage.attr('src', "{% static 'images/NoImage.jpg' %}");
+                        }
+                        }
+                    });
+                });
+            });  
+        });
+        // Get the cancel button and the x button
+        const $cancelButton = document.querySelector('#delete-modal .btn-outline-light');
+        const $closeButton = document.querySelector('#delete-modal .close');
+
+        // Add event listeners to both buttons
+        $cancelButton.addEventListener('click', function() {
+        // Close the modal when cancel button is clicked
+            deleteModal.classList.remove('show');
+            deleteModal.style.display = 'none';
+        });
+
+        $closeButton.addEventListener('click', function() {
+        // Close the modal when x button is clicked
+            deleteModal.classList.remove('show');
+            deleteModal.style.display = 'none';
+        });
+        
+    </script>
+    <!--Delete Sortable Elements-->
+    
+    <!--Delete Asset Coordinates-->
+    <script>
+        function deleteAcCord(assetId) {
+            event.preventDefault;
+            // Find the relevant <li> element
+            const listItem = $('li[data-id="' + assetId + '"]');
+            console.log(assetId)
+            // Delete the data from frontend
+            listItem.remove();
+          
+            // Delete the data from backend using AJAX
+            $.ajax({
+              url: "{% url 'delete_accoord' %}",
+              method: 'POST',
+              data: { assetCoordId: assetId },
+              success: function(response) {
+                // Handle success response
+              },
+              error: function(xhr, status, error) {
+                // Handle error
+              }
+            });
+          }
+    </script>
+    <!--Delete Asset Coordinates-->
+
+    <!--Get Relevant Product and Messages-->
+    <script>
+        $(document).ready(function() {
+            $('#addProductBtn').click(function() {
+                var $addProBtn = $("#addProductBtn"); 
+                var assetId = $addProBtn.attr('data-id');
+                console.log(assetId);
+        
+                $('#savedProduct').empty();
+                $('#savedMessages').empty();
+                $('[id^="customCheck-"], [id^="messageCheck-"]').prop('checked', false);
+
+        
+                // Send AJAX request to the backend
+                $.ajax({
+                    url: "{% url 'get_products_messages' %}",
+                    method: 'POST',
+                    data: { assetId: assetId },
+                    success: function(response) {
+                        // Check the relevant checkboxes based on the response data
+                        var products = response.products;
+                        var messages = response.messages;
+                        console.log(products);
+                        console.log(messages);
+        
+                        products.forEach(function(product) {
+                            var productId = product.id;
+                            // Create and append the relevant product badge
+                            var badge = $('<span>').addClass('badge rounded-pill bg-success').text(product.name);
+                            $('#savedProduct').append(badge);
+                            $('#customCheck-' + productId).prop('checked', true);
+                        });
+        
+                        messages.forEach(function(message) {
+                            var messageId = message.id;
+                            // Create and append the relevant message badge
+                            var badge = $('<span>').addClass('badge rounded-pill bg-info').text(message.name);
+                            $('#savedMessages').append(badge);
+                            $('#messageCheck-' + messageId).prop('checked', true);
+                        });
+        
+                        // Open the modal
+                        $('#file-product').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error if necessary
+                    }
+                });
+            });
+        });
+        
+    </script>
+    <!--Get Relevant Product and Messages-->
+        
+    <!--Product onclick relevant Messages display-->
+    <script>
+        $(document).ready(function() {    
+            // Handle product click event
+            $(".product-item").click(function() {
+                // Get the product ID
+                var productId = $(this).data('product-id');
+                console.log(productId);
+        
+                // Hide all message items
+                $(".message-item").addClass('d-none');
+        
+                // Show relevant message items for the clicked product
+                $(".message-product-" + productId).removeClass('d-none');
+                $(".message-product-" + productId).removeClass('d-block');
+
+            });
+        });
+    </script>
+    <!--Product onclick relevant Messages display-->
+
+    <!--Save Product and Messages-->
+    <script>
+        function saveProductMessages() {
+            // Retrieve the assetId
+            var $addProBtn = $("#addProductBtn");
+            var assetId = $addProBtn.attr('data-id');
+        
+            // Retrieve the selected checkboxes for products and messages
+            var selectedProducts = getSelectedCheckboxes('customCheck');
+            var selectedMessages = getSelectedCheckboxes('messageCheck');
+            // Close the modal
+            $('#file-product').modal('hide');
+        
+            // Send the data to the backend
+            $.ajax({
+                url: "{% url 'save_product_messages' %}",
+                method: 'POST',
+                data: {
+                    assetId: assetId,
+                    products: selectedProducts,
+                    messages: selectedMessages
+                },
+                success: function (response) {
+                    // Handle success response
+                },
+                error: function (xhr, status, error) {
+                    // Handle error if necessary
+                }
+            });
+        
+            function getSelectedCheckboxes(checkboxName) {
+                var selectedCheckboxes = [];
+                $('input[id^="' + checkboxName + '"]:checked').each(function () {
+                    var checkboxId = $(this).attr('id');
+                    var id = checkboxId.split('-')[1];
+                    selectedCheckboxes.push(id);
+                });
+                return selectedCheckboxes;
+            }
+        }
+    </script>
+    <!--Save Product and Messages-->
+        
+
+    <script>
+        function showCoordinate(startTop, startLeft, endTop, endLeft, coordinate_type, is_embedded, isEveryLink) {
+            // Calculate the parent width and height
+            const contain = $('#containment-wrapper')[0];
+            const containerRect = contain.getBoundingClientRect();
+            const parentWidth = containerRect.width;
+            const parentHeight = containerRect.height;
+          
+            // Convert the percentage-based coordinates back to pixel values
+            const startTopPx = Math.round((startTop / 100000) * parentHeight) + containerRect.top;
+            const startLeftPx = Math.round((startLeft / 100000) * parentWidth) + containerRect.left;
+            const endTopPx = Math.round((endTop / 100000) * parentHeight) + containerRect.top;
+            const endLeftPx = Math.round((endLeft / 100000) * parentWidth) + containerRect.left;
+          
+            const div = document.getElementById('closable-div');
+            const coordText = document.getElementById('coordText');
+            // Set the position of the div using the calculated pixel values
+            div.style.top = startTopPx + 'px';
+            div.style.left = startLeftPx + 'px';
+            div.style.width = (endLeftPx - startLeftPx) + 'px';
+            div.style.height = (endTopPx - startTopPx) + 'px';
+
+            
+            console.log(is_embedded);
+            console.log(isEveryLink);
+            // Set text values based on coordinateType
+            if (coordinate_type === 'link' && isEveryLink && !is_embedded) {
+                console.log('yeppa');
+                coordText.innerHTML = 'All Slides';
+            } else if (coordinate_type === 'link' && !isEveryLink && !is_embedded) {
+                console.log('yeppa2');
+                coordText.innerHTML = 'Sequence Link';
+            } else if (coordinate_type === 'popup' && !is_embedded && !isEveryLink) {
+                coordText.innerHTML = 'Popup Link';
+            } else if (coordinate_type === 'video' && is_embedded && !isEveryLink) {
+                coordText.innerHTML = 'Embedded Video';
+            } else if (coordinate_type === 'video' && !is_embedded && !isEveryLink){
+                coordText.innerHTML = 'Video Link';
+            }
+
+          
+            // Make the closable div visible
+            div.style.display = "flex";
+          
+            // Add event listener to the close button
+            const closeButton = document.querySelector('.close-button');
+            closeButton.addEventListener('click', function() {
+              div.style.display = "none"; // Hide the closable div
+            });
+            
+          }
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            var darkModeSwitch = $("#darkModeLink");
+            window.CSRF_TOKEN = "{{ csrf_token }}";
+        
+            darkModeSwitch.click(function(event) {
+              event.preventDefault(); // Prevent the default link behavior
+        
+              var darkModeEnabled = darkModeSwitch.hasClass("active"); // Check if the switch is currently enabled
+        
+              // Make an AJAX request to the server to update the user's dark_mode field
+              $.ajax({
+                url: "{% url 'update_dark_mode' %}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                  dark_mode: !darkModeEnabled, // Toggle the value of dark_mode
+                  'csrfmiddlewaretoken': window.CSRF_TOKEN
+                },
+                success: function(response) {
+                  console.log("Dark mode updated");
+                },
+                error: function(xhr, status, error) {
+                  console.error("Error updating dark mode");
+                }
+              });
+            });
+          });
+    </script>
+    <script>
+        $(document).ready(function() {
+          var $firstLi = $("li.card-li:first");
+          $firstLi.click();
+        });
+      </script>
+      <script>
+        $(document).ready(function() {
+          // AJAX request to get notifications
+          $.ajax({
+            url: "{% url 'get_notifications' %}",
+            dataType: 'json',
+            success: function(data) {
+              // Process the received notifications
+              var notifications = data.notifications;
+              var hasUnread = false; // Flag to check if there are unread notifications
+      
+              if (notifications.length > 0) {
+                // Update the notification panel with the received notifications
+                for (var i = 0; i < notifications.length; i++) {
+                  var notification = notifications[i];
+                  var message = notification.message;
+                  var createdAt = notification.created_at;
+                  var isRead = notification.is_read; // Retrieve the "is_read" field from the notification
+      
+                  // Create the notification item
+                  var notificationItem = $('<div class="dropdown-foot dropdown-notification"><a href="#">' + message + '</a><em class="icon ni ni-clock ms-2" data-toggle="tooltip" data-placement="top" title="' + createdAt + '"></em></div>');
+      
+                  // Append the notification item to the panel
+                  $('.nk-notification').append(notificationItem);
+      
+                  // Check if the notification is unread
+                  if (!isRead) {
+                    hasUnread = true; // Set the flag to true if there is at least one unread notification
+                  }
+                }
+      
+                // Reinitialize tooltips
+                $('[data-toggle="tooltip"]').tooltip();
+              } else {
+                // Show a message indicating no notifications
+                $('.nk-notification').append('<div class="dropdown-foot dropdown-notification"><p href="#">Bildirim bulunmamaktatır.</p></div>');
+              }
+      
+              // Add or remove the red dot based on the flag
+              if (hasUnread) {
+                $('.notification-dropdown').append('<span class="unread-indicator"></span>');
+              } else {
+                $('.unread-indicator').remove();
+              }
+            },
+            error: function() {
+              // Handle error if the AJAX request fails
+              console.error('Failed to retrieve notifications.');
+            }
+          });
+        });
+    </script>
+    <script>
+        // Click event for opening the dropdown
+        $('.notification-toggle').click(function() {
+            // Remove the unread indicator
+            $('.unread-indicator').remove();
+        
+            // AJAX request to mark notifications as read
+            $.ajax({
+                url: "{% url 'mark_notifications_as_read' %}",
+                method: 'POST',
+                success: function() {
+                console.log('Notifications marked as read.');
+                },
+                error: function() {
+                console.error('Failed to mark notifications as read.');
+                }
+            });
+            });
+    </script>
+</body>
+
+</html>

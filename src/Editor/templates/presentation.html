@@ -1,0 +1,910 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr-TR" class="js">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="HTML and PDF Editor for OCE App, Produced by IQVIA">
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="{% static 'images/iqvialogoicon.png' %}">
+    <!-- Page Title  -->
+    <title>IQVIA | OCE Editor</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="{% static 'css/dashlite.css' %}">
+    <link id="skin-default" rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+</head>
+
+<body class="nk-body npc-apps apps-only has-apps-sidebar npc-apps-files">
+    {% if user.dark_mode %}
+    <script>
+        var toggle = document.getElementsByClassName('dark-switch')[0];
+        var body = document.getElementsByTagName('body')[0];
+        body.classList.add('dark-mode');
+        toggle.classList.add('active');
+    </script>
+    {% endif %}
+    <div class="nk-app-root">
+        <!-- main @s -->
+        <div class="nk-main ">
+            <!-- wrap @s -->
+            <div class="nk-wrap ">
+                <!-- main header @s -->
+                <div class="nk-header nk-header-fixed is-light">
+                    <div class="container-fluid">
+                        <div class="nk-header-wrap">
+                            <div class="nk-header-app-name">
+                                <img class="logo-img img-fluid me-3" style="max-width:170px;" src="{% static 'images/iqvialogo.png' %}" srcset="{% static 'images/iqvialogo.png' %}" alt="logo">
+                            <div class="nk-header-app-info">
+                                <span class="lead-text ms-4">OCE Editor</span>
+                            </div>
+                        </div>
+                            <div class="nk-header-tools">
+                                <ul class="nk-quick-nav">
+                                    <li class="dropdown help-dropdown">
+                                        <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
+                                            <div class=""><em class="icon icon-circle bg-success-dim ni ni-help"></em></div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end">
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title">SSS</span>
+                                            </div>
+                                            <div class="dropdown-body">
+                                                <div class="nk-help">
+                                                    <div class="dropdown-foot">
+                                                        <a href="#">Nasıl sekans eklerim?</a>
+                                                    </div>
+                                                    <div class="dropdown-foot">
+                                                        <a href="#">Sunumu OCE'ye nasıl gönderebilirim?</a>
+                                                    </div>
+                                                    <div class="dropdown-foot">
+                                                        <a href="#">bla bla</a>
+                                                    </div>
+                                                </div><!-- .nk-notification -->
+                                            </div><!-- .nk-dropdown-body -->
+                                            <div class="dropdown-foot dropdown-notification center">
+                                                <a href="#">Hepsini Görüntüle</a>
+                                            </div>
+                                        </div>
+                                    </li><!-- .dropdown -->
+                                    <li class="dropdown notification-dropdown">
+                                        <a href="#" class="dropdown-toggle nk-quick-nav-icon notification-toggle" data-bs-toggle="dropdown">
+                                            <div class=""><em class="icon icon-circle ni ni-bell"></em></div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end">
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title">BİLDİRİMLER</span>
+                                            </div>
+                                            <div class="dropdown-body">
+                                                <div class="nk-notification">
+                                                    <div id="notification-panel">
+                                                        <!-- Notifications will be dynamically added here -->
+                                                    </div>
+                                                </div>
+                                            </div><!-- .nk-dropdown-body -->
+                                        </div>
+                                    </li><!-- .dropdown -->                                 
+                                    <li class="dropdown user-dropdown">
+                                        <a href="#" class="dropdown-toggle me-n1" data-bs-toggle="dropdown">
+                                            <div class="user-toggle">
+                                                <div class="user-avatar sm">
+                                                    <img class="logo-img img-fluid" style="max-width:170px;" src="{% if user.company.logo %}{{ user.company.logo.url }}{% else %}{% static 'images/company_logo.png' %}{% endif %}" alt="logo">
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end">
+                                            <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
+                                                <div class="user-card">
+                                                    <div class="user-avatar">
+                                                        <span>{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+                                                    </div>
+                                                    <div class="user-info">
+                                                        <span class="lead-text">{{ user.company.name }}</span>
+                                                        <span class="sub-text">{{ user.first_name }} {{ user.last_name }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="{% url 'settings' %}"><em class="icon ni ni-setting-alt"></em><span>Ayarlar</span></a></li>
+                                                    <li><a id="darkModeLink" class="dark-switch"><em class="icon ni ni-moon"></em><span>Koyu Tema</span></a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="{% url 'logout' %}"><em class="icon ni ni-signout"></em><span>Çıkış Yap</span></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- main header @e -->
+
+                <!-- content @s -->
+                <div class="nk-content p-0">
+                    <div class="nk-content-inner">
+                        <div class="nk-content-body">
+                            <div class="nk-fmg">
+                                <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
+                                    <div class="nk-fmg-aside-wrap">
+                                        <div class="nk-fmg-aside-top">
+                                            <ul class="nk-fmg-menu">
+                                                <li>
+                                                    <a class="nk-fmg-menu-item" href="{% url 'folders' %}">
+                                                        <em class="icon ni ni-file-docs"></em>
+                                                        <span class="nk-fmg-menu-text">Klasörler</span>
+                                                    </a>
+                                                </li>
+                                                <li class="active">
+                                                    <a class="nk-fmg-menu-item" href="{% url 'presentation_list' %}">
+                                                        <em class="icon ni ni-img"></em>
+                                                        <span class="nk-fmg-menu-text">Sunumlar</span>
+                                                    </a>
+                                                </li>                        
+                                                <li>
+                                                    <a class="nk-fmg-menu-item" href="{% url 'settings' %}">
+                                                        <em class="icon ni ni-setting-alt"></em>
+                                                        <span class="nk-fmg-menu-text">Ayarlar</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div><!-- .nk-fmg-aside -->
+                                <div class="nk-fmg-body">
+                                    <div class="nk-fmg-body-head d-none d-lg-flex">
+                                        <div class="nk-fmg-search">
+                                            <em class="icon ni ni-search"></em>
+                                            <input type="text" id='searchInput' class="form-control border-transparent form-focus-none" placeholder="Sunum Ara">
+                                        </div>
+                                        {% comment %} <div class="nk-fmg-actions">
+                                            <ul class="nk-block-tools g-3">
+                                                <a href="#presentation-create" class="btn btn-light" data-bs-toggle="modal"><em class="icon ni ni-plus"></em> <span>Yeni Sunum</span></a>
+                                            </ul>
+                                        </div> {% endcomment %}
+                                    </div>
+                                    <div class="nk-fmg-body-content">
+                                        <div class="nk-block-head nk-block-head-sm">
+                                            <div class="nk-block-between position-relative">
+                                                <div class="nk-block-head-content">
+                                                    <h3 class="nk-block-title page-title">Sunumlar</h3>
+                                                </div>
+                                                <div class="nk-block-head-content">
+                                                    <ul class="nk-block-tools g-1">
+                                                        <li class="d-lg-none">
+                                                            <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
+                                                        </li>
+                                                        <li class="d-lg-none" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Liste Görünümü">
+                                                            <a href="html/apps/presentation-list-view.html" class="btn btn-trigger btn-icon"><em class="icon ni ni-view-row-wd"></em></a>
+                                                        </li>
+                                                        {% comment %} <li class="d-lg-none">
+                                                            <div class="dropdown">
+                                                                <a href="#presentation-create" class="btn btn-trigger btn-icon" data-bs-toggle="modal"><em class="icon ni ni-plus"></em></a>
+                                                            </div>
+                                                        </li> {% endcomment %}
+                                                        <li class="d-lg-none me-n1"><a href="#" class="btn btn-trigger btn-icon toggle" data-target="files-aside"><em class="icon ni ni-menu-alt-r"></em></a></li>
+                                                    </ul>
+                                                </div>
+                                                <div class="search-wrap px-2 d-lg-none" data-search="search">
+                                                    <div class="search-content">
+                                                        <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
+                                                        <input type="text" class="form-control border-transparent form-focus-none" placeholder="Sunum Ara">
+                                                        <button class="search-submit btn btn-icon"><em class="icon ni ni-search"></em></button>
+                                                    </div>
+                                                </div><!-- .search-wrap -->
+                                                <div class="nk-block-head-content d-none d-lg-block">
+                                                    <ul class="nk-block-tools g-3">
+                                                        <li data-bs-toggle="tooltip" data-bs-placement="left" title="Izgara Görünümü"><a href="{% url 'presentation' %}" class="nk-switch-icon active"><em class="icon ni ni-view-grid3-wd"></em></a></li>
+                                                        <li data-bs-toggle="tooltip" data-bs-placement="left" title="Liste Görünümü"><a href="{% url 'presentation_list' %}" class="nk-switch-icon"><em class="icon ni ni-view-row-wd"></em></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div><!-- .nk-block-head -->
+                                        <div class="nk-block">
+                                            <div class="row g-gs">
+                                                {% if presentations %}
+                                                    {% for p in presentations %}
+                                                    <div class="col-sm-6 col-lg-3 col-xxl-3" data-search-id="{{p.name}}">
+                                                        <div class="gallery card card-bordered">
+                                                            {% if p.firstAsset != null%}
+                                                                <a class="gallery-image popup-image" href="{{p.firstAsset}}">
+                                                                    <img class="w-100 rounded-top" src="{{p.firstAsset}}" alt="" style='height: 170px;object-fit: cover;'>
+                                                                </a>
+                                                            {% else %}
+                                                                <a class="gallery-image popup-image" href="{% static 'images/NoImage.jpg' %}" alt=''>
+                                                                    <img class="w-100 rounded-top" src="{% static 'images/NoImage.jpg' %}" alt="" style='height: 170px;object-fit: cover;'>
+                                                                </a>
+                                                            {% endif %}
+                                                            <div class="gallery-body card-inner align-center justify-between flex-wrap g-2">
+                                                                <div class="user-card w-100">
+                                                                    <div class="user-info w-100">
+                                                                        <div class='d-flex w-100 justify-content-between'>
+                                                                            <div style='width:80%;overflow:hidden;'>
+                                                                                <span class="lead-text folderName">{{p.name}}</span>
+                                                                            </div>
+                                                                            {% if p.is_push_oce %}
+                                                                            <div class="tb-lead"><em class="icon ni ni-check-circle-cut" style="font-size: 20px;color:green;"></em></div>
+                                                                            {% else %}
+                                                                            <div class="tb-lead"><em class="icon ni ni-cross-circle" style="font-size: 20px;color:red;"></em></div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <span class="sub-text mt-2">
+                                                                            {% if p.products %}
+                                                                                {% for product in p.products %}
+                                                                                <span style="font-size: 0.6rem;{% if forloop.counter > 2 %} display: none;{% endif %}" class="hash bg-teal-dim">{{ product }}</span>
+                                                                                {% endfor %}
+                                                                                {% if p.remaining_products > 0 %}
+                                                                                    <div class="col-sm-6">
+                                                                                        <span style="font-size: 0.6rem;" class="hash bg-teal-dim hover-text">+{{ p.remaining_products }} fazlası</span>
+                                                                                        <div class="remaining-products card d-none">
+                                                                                            <div class="card-body">
+                                                                                                {% for product in p.products|slice:"2:" %}
+                                                                                                <span style="font-size: 0.6rem;" class="hash bg-teal-dim">{{ product }}</span>
+                                                                                                {% endfor %}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                            {% else %}
+                                                                            <span style="font-size: 0.6rem;" class="hash bg-warning-dim">Ürün Bulunamadı.</span>
+                                                                            {% endif %}
+                                                                        </span>
+                                                                        
+                                                                    </div>
+                                                                </div>
+                                                                <br>
+                                                                <div class="w-100 d-flex justify-content-center">
+                                                                    <a href="{% url 'preview' p.id %}" class="btn btn-p-0 btn-nofocus" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Önizleme"><em class="icon ni ni-play-circle"></em></a>
+                                                                    <a href="{% url 'edit' p.id %}" class="btn btn-p-0 btn-nofocus" data-bs-toggle="tooltip" data-bs-placement="bottom" title="İçerik Düzenle"><em class="icon ni ni-edit"></em></a>
+                                                                    <button class="btn btn-p-0 btn-nofocus" data-bs-toggle="dropdown" data-bs-placement="bottom"><em class="icon ni ni-more-v"></em></button>
+                                                                    <div class="dropdown">
+                                                                        <div class="dropdown-menu dropdown-menu-end" >
+                                                                            <ul class="link-list-plain no-bdr">
+                                                                                <li><a href="#presentation-details-{{p.id}}" data-bs-toggle="modal"><em class="icon ni ni-eye"></em><span>Detaylar</span></a></li>
+                                                                                <li><a href="#presentation-settings-{{p.id}}" data-bs-toggle="modal"><em class="icon ni ni-pen"></em><span>Sunum Ayarları</span></a></li>                                                                          
+                                                                                <li data-pre-name="{{p.name}}" data-pre-id="{{p.id}}" onclick="downloadZip('{{p.id}}', '{{p.name}}')"><a href="#" class="file-dl-toast"><em class="icon ni ni-download"></em><span>Zip Olarak İndir</span></a></li>
+                                                                                <li><a href="#" class="file-pdf-toast" onclick="downloadPdf('{{p.id}}', '{{p.name}}')"><em class="icon ni ni-download"></em><span>PDF Olarak İndir</span></a></li>
+                                                                                <li><a href="#" class='sendToOce' data-pre-name="{{p.name}}" data-pre-id="{{p.id}}" data-oce="{{p.is_push_oce}}"><em class="icon ni ni-forward-arrow"></em><span>OCE'ye Gönder</span></a></li>
+                                                                                <li><a href="#presentation-delete-{{p.id}}" data-bs-toggle="modal"><em class="icon ni ni-trash"></em><span>Sil</span></a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                <div class='d-flex align-items-center mt-5'>
+                                                    <em style='font-size:30px;' class="icon ni ni-folder-remove"></em>
+                                                    <h6 class='mt-1 ms-4'> Sunum Bulunamadı. </h6>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div><!-- .nk-block -->
+                                    </div><!-- .nk-fmg-body-content -->
+                                </div><!-- .nk-fmg-body -->
+                            </div><!-- .nk-fmg -->
+                        </div>
+                    </div>
+                </div>
+                <!-- content @e -->
+            </div>
+            <!-- wrap @e -->
+        </div>
+        <!-- main @e -->
+    </div>
+
+    {% comment %} <div class="modal fade" tabindex="-1" role="dialog" id="presentation-create">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-center">
+                    <div class="nk-file-title">
+                        <div class="nk-file-icon">
+                            <span class="nk-file-icon-type">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+                                    <path d="M49,61H23a5.0147,5.0147,0,0,1-5-5V16a5.0147,5.0147,0,0,1,5-5H40.9091L54,22.1111V56A5.0147,5.0147,0,0,1,49,61Z" style="fill:#e3edfc" />
+                                    <path d="M54,22.1111H44.1818a3.3034,3.3034,0,0,1-3.2727-3.3333V11s1.8409.2083,6.9545,4.5833C52.8409,20.0972,54,22.1111,54,22.1111Z" style="fill:#b7d0ea" />
+                                    <path d="M19.03,59A4.9835,4.9835,0,0,0,23,61H49a4.9835,4.9835,0,0,0,3.97-2Z" style="fill:#c4dbf2" />
+                                    <path d="M27.2223,43H44.7086s2.325-.2815.7357-1.897l-5.6034-5.4985s-1.5115-1.7913-3.3357.7933L33.56,40.4707a.6887.6887,0,0,1-1.0186.0486l-1.9-1.6393s-1.3291-1.5866-2.4758,0c-.6561.9079-2.0261,2.8489-2.0261,2.8489S25.4268,43,27.2223,43Z" style="fill:#755de0" />
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="nk-file-name">
+                            <div class="nk-file-name-text"><span class="title">Yeni Sunum</span></div>
+                        </div>
+                    </div>
+                    <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                </div>
+                <form action="{% url 'createpresentation' %}" method="post">
+                    {% csrf_token %}
+                <div class="modal-body p-0">
+                    <div class="nk-file-share-header">
+                        <div class="nk-file-share-group">
+                            <div class="nk-file-share-input-group">
+                                <div class="nk-file-share-input">
+                                    <input type="hidden" name="form_name" value="presentation-form">
+                                    <label class="label" style="width:200px;" >Sunum Adı</label>
+                                    <input type="text" class="input-mail tagify" name='newpresentationname' placeholder="Sunum Adını Giriniz">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .modal-body -->
+                <div class="modal-footer bg-light">
+                    <ul class="btn-toolbar g-3">
+                        <li><button href="#" data-bs-dismiss="modal" class="btn btn-outline-light btn-white ">İptal</button></li>
+                        <li><button href="#" type='submit' class="btn btn-primary" id='createnewfile'>Oluştur</button></li>
+                    </ul>
+                </div><!-- .modal-footer -->
+                </form>
+            </div><!-- .modal-content -->
+        </div><!-- .modla-dialog -->
+    </div> {% endcomment %}
+    <!-- .modal -->
+    {% for p in presentations %}
+    <!-- app-root @e -->
+    <form action="{% url 'presentation_settings' p.id %}" method="post">
+        {% csrf_token %}
+    <div class="modal fade" tabindex="-1" role="dialog" id="presentation-settings-{{p.id}}">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-center">
+                    <div class="nk-file-title">
+                        <div class="nk-file-icon">
+                            <span class="nk-file-icon-type">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+                                    <path d="M49,61H23a5.0147,5.0147,0,0,1-5-5V16a5.0147,5.0147,0,0,1,5-5H40.9091L54,22.1111V56A5.0147,5.0147,0,0,1,49,61Z" style="fill:#e3edfc" />
+                                    <path d="M54,22.1111H44.1818a3.3034,3.3034,0,0,1-3.2727-3.3333V11s1.8409.2083,6.9545,4.5833C52.8409,20.0972,54,22.1111,54,22.1111Z" style="fill:#b7d0ea" />
+                                    <path d="M19.03,59A4.9835,4.9835,0,0,0,23,61H49a4.9835,4.9835,0,0,0,3.97-2Z" style="fill:#c4dbf2" />
+                                    <path d="M27.2223,43H44.7086s2.325-.2815.7357-1.897l-5.6034-5.4985s-1.5115-1.7913-3.3357.7933L33.56,40.4707a.6887.6887,0,0,1-1.0186.0486l-1.9-1.6393s-1.3291-1.5866-2.4758,0c-.6561.9079-2.0261,2.8489-2.0261,2.8489S25.4268,43,27.2223,43Z" style="fill:#755de0" />
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="nk-file-name">
+                            <div class="nk-file-name-text"><span class="title">Değiştir - {{p.name}}</span></div>
+                        </div>
+                    </div>
+                    <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="nk-file-share-header">
+                        <div class="nk-file-share-group">
+                            <div class="nk-file-share-input-group">
+                                <div class="nk-file-share-input-group d-flex row">
+                                    <div class="nk-file-share-input col-12 mb-3">
+                                        <label class="label" style="width:200px;">Sunum Adı</label>
+                                        <input type="text" class="input-mail tagify" value="{{p.name}}" name='newpresentationname'>
+                                    </div>
+                                    <div class="nk-file-share-input col-6">
+                                        <label class="label" style="width:100px;">Start Date</label>
+                                        <div class="form-control-wrap">
+                                            <div class="form-icon form-icon-right">
+                                                <em class="icon ni ni-calendar-alt"></em>
+                                            </div>
+                                            <input type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy" class="form-control form-control-sm date-picker" name='preStart' value={{p.start_date|date:'d-m-Y'}}>
+                                        </div>
+                                    </div>
+                                    <div class="nk-file-share-input col-6">
+                                        <label class="label" style="width:100px;">End Date</label>
+                                        <div class="form-control-wrap">
+                                            <div class="form-icon form-icon-right">
+                                                <em class="icon ni ni-calendar-alt"></em>
+                                            </div>
+                                            <input type="text" placeholder="dd-mm-yyyy" data-date-format="dd-mm-yyyy" class="form-control form-control-sm date-picker" name='preEnd' value={{p.end_date|date:'d-m-Y'}}>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .modal-body -->
+                <div class="modal-footer bg-light">
+                    <ul class="btn-toolbar g-3">
+                        <li><a href="#" data-bs-dismiss="modal" class="btn btn-outline-light btn-white">İptal</a></li>
+                        <li><button type='submit' name='presentation-submit' class="btn btn-primary">Kaydet</button></li>
+                    </ul>
+                </div><!-- .modal-footer -->
+            </div><!-- .modal-content -->
+        </div><!-- .modla-dialog -->
+    </div><!-- .modal -->
+    </form>
+    <div class="modal fade" tabindex="-1" role="dialog" id="presentation-details-{{p.id}}">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-center">
+                    <div class="nk-file-title">
+                        <div class="nk-file-icon">
+                            <span class="nk-file-icon-type">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+                                    <path d="M49,61H23a5.0147,5.0147,0,0,1-5-5V16a5.0147,5.0147,0,0,1,5-5H40.9091L54,22.1111V56A5.0147,5.0147,0,0,1,49,61Z" style="fill:#e3edfc" />
+                                    <path d="M54,22.1111H44.1818a3.3034,3.3034,0,0,1-3.2727-3.3333V11s1.8409.2083,6.9545,4.5833C52.8409,20.0972,54,22.1111,54,22.1111Z" style="fill:#b7d0ea" />
+                                    <path d="M19.03,59A4.9835,4.9835,0,0,0,23,61H49a4.9835,4.9835,0,0,0,3.97-2Z" style="fill:#c4dbf2" />
+                                    <path d="M27.2223,43H44.7086s2.325-.2815.7357-1.897l-5.6034-5.4985s-1.5115-1.7913-3.3357.7933L33.56,40.4707a.6887.6887,0,0,1-1.0186.0486l-1.9-1.6393s-1.3291-1.5866-2.4758,0c-.6561.9079-2.0261,2.8489-2.0261,2.8489S25.4268,43,27.2223,43Z" style="fill:#755de0" />
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="nk-file-name">
+                            <div class="nk-file-name-text"><span class="title">{{p.name}}</span></div>
+                        </div>
+                    </div>
+                    <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                </div>
+                <div class="modal-body">
+                    <div class="nk-file-details">
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Tür</div>
+                            <div class="nk-file-details-col">Sunum</div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Boyut</div>
+                            <div class="nk-file-details-col">{{ p.total_size|floatformat:1 }} MB</div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Sekanslar</div>
+                            <div class="nk-file-details-col">{{p.num_of_asset}}</div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Oluşturuldu</div>
+                            <div class="nk-file-details-col">{{p.created_date}}</div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Son Güncelleme</div>
+                            <div class="nk-file-details-col">{{p.last_updated_date}}</div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Aktivasyon Başlangıç</div>
+                            <div class="nk-file-details-col">
+                                {% if p.start_date %}
+                                    {{ p.start_date }}
+                                {% else %}
+                                    ---
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Aktivasyon Bitiş</div>
+                            <div class="nk-file-details-col">
+                                {% if p.end_date %}
+                                    {{ p.end_date }}
+                                {% else %}
+                                    ---
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .modal-body -->
+            </div><!-- .modal-content -->
+        </div><!-- .modla-dialog -->
+    </div><!-- .modal -->
+    <!-- @@ File Upload Modal @e -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="presentation-upload-{{p.id}}">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                <div class="modal-body modal-body-md">
+                    <div class="nk-upload-form">
+                        <h5 class="title mb-3">Dosya Yükle</h5>
+                        <div class="upload-zone small bg-lighter">
+                            <div class="dz-message" data-dz-message>
+                                <span class="dz-message-text">Fotoğrafları <span>Sürükle/Bırak</span> veya <br> <span>Bilgisayardan Tara</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nk-modal-action justify-end">
+                        <ul class="btn-toolbar g-4 align-center">
+                            <li><a href="#" data-bs-dismiss="modal" class="link link-primary">İptal</a></li>
+                            <li><a href='{% url 'presentation' %}' class="btn btn-primary">Kaydet</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div><!-- .modal-content -->
+        </div><!-- .modla-dialog -->
+    </div><!-- .modal -->
+    <!-- @@ File Delete Modal @e -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="presentation-delete-{{p.id}}">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-center">
+                    <div class="nk-file-title">
+                        <div class="nk-file-icon">
+                            <span class="nk-file-icon-type">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+                                    <path d="M49,61H23a5.0147,5.0147,0,0,1-5-5V16a5.0147,5.0147,0,0,1,5-5H40.9091L54,22.1111V56A5.0147,5.0147,0,0,1,49,61Z" style="fill:#e3edfc" />
+                                    <path d="M54,22.1111H44.1818a3.3034,3.3034,0,0,1-3.2727-3.3333V11s1.8409.2083,6.9545,4.5833C52.8409,20.0972,54,22.1111,54,22.1111Z" style="fill:#b7d0ea" />
+                                    <path d="M19.03,59A4.9835,4.9835,0,0,0,23,61H49a4.9835,4.9835,0,0,0,3.97-2Z" style="fill:#c4dbf2" />
+                                    <path d="M27.2223,43H44.7086s2.325-.2815.7357-1.897l-5.6034-5.4985s-1.5115-1.7913-3.3357.7933L33.56,40.4707a.6887.6887,0,0,1-1.0186.0486l-1.9-1.6393s-1.3291-1.5866-2.4758,0c-.6561.9079-2.0261,2.8489-2.0261,2.8489S25.4268,43,27.2223,43Z" style="fill:#755de0" />
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="nk-file-name">
+                            <div class="nk-file-name-text"><span class="title">Silmeyi Onayla - {{p.name}}</span></div>
+                        </div>
+                    </div>
+                    <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="nk-file-share-header">
+                        <div class="nk-file-share-group">
+                            <div class="nk-file-share-input-group">
+                                <div class="nk-file-share-input">
+                                    <p>Silmek istediğinize emin misiniz?</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .modal-body -->
+                <div class="modal-footer bg-light">
+                    <ul class="btn-toolbar g-3">
+                        <li><a href="#" data-bs-dismiss="modal" class="btn btn-outline-light btn-white">İptal</a></li>
+                        <li><a href="{% url 'deletepresentation' p.id %}" class="btn btn-danger">Sil</a></li>
+                    </ul>
+                </div><!-- .modal-footer -->
+            </div><!-- .modal-content -->
+        </div><!-- .modla-dialog -->
+    </div><!-- File Delete modal -->
+    <!-- @@ Push to Oce Modal @e -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="pushToOce-modal">
+        <div class="modal-dialog modal-md" role="document">
+          <div class="modal-content">
+            <div class="modal-header align-center">
+              <div class="nk-file-title">
+                <div class="nk-file-icon">
+                  <span class="nk-file-icon-type">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+                        <path d="M49,61H23a5.0147,5.0147,0,0,1-5-5V16a5.0147,5.0147,0,0,1,5-5H40.9091L54,22.1111V56A5.0147,5.0147,0,0,1,49,61Z" style="fill:#e3edfc" />
+                        <path d="M54,22.1111H44.1818a3.3034,3.3034,0,0,1-3.2727-3.3333V11s1.8409.2083,6.9545,4.5833C52.8409,20.0972,54,22.1111,54,22.1111Z" style="fill:#b7d0ea" />
+                        <path d="M19.03,59A4.9835,4.9835,0,0,0,23,61H49a4.9835,4.9835,0,0,0,3.97-2Z" style="fill:#c4dbf2" />
+                        <path d="M27.2223,43H44.7086s2.325-.2815.7357-1.897l-5.6034-5.4985s-1.5115-1.7913-3.3357.7933L33.56,40.4707a.6887.6887,0,0,1-1.0186.0486l-1.9-1.6393s-1.3291-1.5866-2.4758,0c-.6561.9079-2.0261,2.8489-2.0261,2.8489S25.4268,43,27.2223,43Z" style="fill:#755de0" />
+                    </svg>
+                  </span>
+                </div>
+                <div class="nk-file-name">
+                  <div class="nk-file-name-text"><span class="title" id='sendupdate'></span></div>
+                </div>
+              </div>
+              <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            </div>
+            <div class="modal-body p-0">
+              <div class="nk-file-share-header">
+                <div class="nk-file-share-group">
+                  <div class="nk-file-share-input-group">
+                    <div class="nk-file-share-input">
+                      <p class="decision"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer bg-light">
+              <ul class="btn-toolbar g-3">
+                <li><button class="btn btn-outline-light btn-white" data-bs-dismiss="modal">İptal</button></li>
+                <li><button class="btn btn-success file-up-toast" id="push-btn" >Gönder</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+    </div>
+     <!-- @@ Push to Oce Modal @e -->
+    
+    {% endfor %}
+    <!-- footer @s -->
+    <div class="nk-footer">
+        <div class="container-fluid">
+            <div class="nk-footer-wrap">
+                <div class="nk-footer-copyright ms-auto">Tüm Hakları Saklıdır. &copy; 2023  <a href="https://www.iqvia.com/tr-tr/locations/turkey" target="_blank">IQVIA  </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- footer @e -->
+    <!-- JavaScript -->
+    <script src="{% static 'js/bundle.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+    
+    <script>
+        NioApp.Dropzone.init = function () {
+            NioApp.Dropzone('.upload-zone', {
+              url: "/uploadimages/{{pre.id}}",
+              autoProcessQueue:true,
+            });
+          };
+    </script>
+    <script>
+        function downloadZip(id, preName) {
+            window.CSRF_TOKEN = "{{ csrf_token }}"; // Set the CSRF token for authentication
+            // Create a data object with the 'id' parameter
+            var data = {
+                'preId': id, // Pass the 'id' parameter to the server as 'preId'
+                'csrfmiddlewaretoken': window.CSRF_TOKEN, // Include the CSRF token in the request for authentication
+            };
+            console.log(id); // Print the 'id' parameter to the console for debugging
+
+            // Make AJAX request to the server with the 'data' object
+            $.ajax({
+                url: "{% url 'download_folder' %}", // Replace with your actual download ZIP URL
+                type: 'POST', // Use the POST method for the request
+                data: data, // Include the 'data' object in the request
+                xhrFields: {
+                    responseType: 'blob' // Set the expected response type to 'blob' to receive a binary response
+                },
+                success: function(blob) {
+                    // Create a temporary link to the zip file and click it to download the file
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob); // Create a temporary object URL for the blob response
+                    link.download = preName; // Set the desired filename for the zip file
+                    link.click();
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response from the server
+                    console.error('AJAX error:', error);
+                }
+            });  
+        }
+    </script>
+    <script>
+        function downloadPdf(presentationId, prename) {
+            console.log(presentationId);
+            window.CSRF_TOKEN = "{{ csrf_token }}"; // Set the CSRF token for authentication
+
+            console.log(presentationId); // Print the 'id' parameter to the console for debugging
+
+            // Make AJAX request to the server with the 'data' object
+            $.ajax({
+                url: "{% url 'download_images_as_pdf' %}",
+                type: 'GET',
+                data: {presentation_id: presentationId},
+                success: function(response) {
+                    // Create a temporary anchor element to trigger the download
+                    let a = document.createElement('a');
+                    let blob = new Blob([response], {type: 'application/pdf'});
+                    let url = URL.createObjectURL(blob);
+                    a.href = url;
+                    a.download = prename; // Set the desired filename for the download
+                    a.click();
+                    URL.revokeObjectURL(url); // Clean up the URL object
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors here
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+    {% if openupload is True %}
+    <script>
+        $(document).ready(function(){
+            $('#presentation-upload-{{pre.id}}').modal('show');
+        
+        });
+        
+    </script>
+    {% endif %} 
+
+
+    <!--Push/Update OCE Modal Open-->
+    <script>
+        $(document).ready(function() {
+            $('.sendToOce').click(function(e) {
+              e.preventDefault();
+              
+              var preName = $(this).data('pre-name');
+              var preId = $(this).data('pre-id');
+              var oce = ($(this).data('oce') || '').toLowerCase() === 'true';
+              
+              // Set the modal title and decision text based on the oce value
+              if (oce) {
+                $('#pushToOce-modal #sendupdate').text('Güncelle - ' + preName);
+                $('#pushToOce-modal .decision').html("Bu Sunum  OCE'de bulunmaktadır.<br>Güncellemek istiyor musunuz?");
+              } else {
+                $('#pushToOce-modal #sendupdate').text('Gönder - ' + preName);
+                $('#pushToOce-modal .decision').text("Bu Sunumu OCE'ye göndermek istiyor musunuz?");
+              }
+              
+              // Open the modal
+              $('#pushToOce-modal').modal('show');
+              
+              // Set the click event for the Send button to call the sendToOce function with the preId parameter and close the modal
+              $('#pushToOce-modal #push-btn').click(function() {
+                  $('#pushToOce-modal').modal('hide');
+                  sendToOce(preId);
+              });
+              
+              // Set the click event for the Cancel and Close buttons to close the modal
+              $('#pushToOce-modal .close, #pushToOce-modal [data-bs-dismiss="modal"], ').click(function() {
+                $('#pushToOce-modal').modal('hide');
+              });
+            });
+          });
+          
+    </script>
+    <!--Push/Update OCE Modal Open-->
+
+    <!--Push/Update OCE Functions/AJAX-->
+    <script>
+        function sendToOce(id) {
+            window.CSRF_TOKEN = "{{ csrf_token }}"; // Set the CSRF token for authentication
+            // Create a data object with the 'id' parameter
+            var data = {
+                'preId': id, // Pass the 'id' parameter to the server as 'preId'
+                'csrfmiddlewaretoken': window.CSRF_TOKEN, // Include the CSRF token in the request for authentication
+            };
+            console.log(id); // Print the 'id' parameter to the console for debugging
+
+            // Make AJAX request to the server with the 'data' object
+            $.ajax({
+                url: "{% url 'push_Oce' %}", // Replace with your actual download ZIP URL
+                type: 'POST', // Use the POST method for the request
+                data: data, // Include the 'data' object in the request
+                success: function(blob) {
+                    console.error(response);
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response from the server
+                    console.error('AJAX error:', error);
+                }
+            });  
+        }
+    </script>
+    <!--Push/Update OCE Functions/AJAX-->
+    <script>
+        $(document).ready(function() {
+            $('.hover-text').hover(function() {
+                console.log('hover');
+                $(this).closest('.col-sm-6').find('.remaining-products').removeClass('d-none');
+            }, function() {
+                $(this).closest('.col-sm-6').find('.remaining-products').addClass('d-none');
+            });
+        });
+    </script>
+    <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var folderNameElements = document.getElementsByClassName('folderName');
+                for (var i = 0; i < folderNameElements.length; i++) {
+                    var folderNameElement = folderNameElements[i];
+                    folderNameElement.addEventListener('mouseenter', function() {
+                        if (this.scrollWidth > this.offsetWidth) {
+                            this.classList.add('animate');
+                        }
+                    });
+                    folderNameElement.addEventListener('mouseleave', function() {
+                        this.classList.remove('animate');
+                    });
+                }
+            });
+    </script>
+    <script>
+        // Get references to the input element and the divs containing the search results
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.querySelectorAll('[data-search-id]');
+
+        // Add event listener to the input element
+        searchInput.addEventListener('input', function () {
+            const searchText = this.value.toLowerCase().trim();
+
+            // Loop through each search result div and check if it includes the search text
+            searchResults.forEach(function (result) {
+                const searchId = result.getAttribute('data-search-id').toLowerCase();
+
+                // Show or hide the div based on the search text match
+                if (searchId.includes(searchText)) {
+                    result.style.display = 'block';
+                } else {
+                    result.style.display = 'none';
+                }
+            });
+        });
+    </script> 
+    <script>
+        $(document).ready(function() {
+            var darkModeSwitch = $("#darkModeLink");
+            window.CSRF_TOKEN = "{{ csrf_token }}";
+        
+            darkModeSwitch.click(function(event) {
+              event.preventDefault(); // Prevent the default link behavior
+        
+              var darkModeEnabled = darkModeSwitch.hasClass("active"); // Check if the switch is currently enabled
+        
+              // Make an AJAX request to the server to update the user's dark_mode field
+              $.ajax({
+                url: "{% url "update_dark_mode" %}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                  dark_mode: !darkModeEnabled, // Toggle the value of dark_mode
+                  'csrfmiddlewaretoken': window.CSRF_TOKEN
+                },
+                success: function(response) {
+                  console.log("Dark mode updated");
+                },
+                error: function(xhr, status, error) {
+                  console.error("Error updating dark mode");
+                }
+              });
+            });
+          });
+    </script>
+
+    
+    
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+          // AJAX request to get notifications
+          $.ajax({
+            url: "{% url 'get_notifications' %}",
+            dataType: 'json',
+            success: function(data) {
+              // Process the received notifications
+              var notifications = data.notifications;
+              var hasUnread = false; // Flag to check if there are unread notifications
+      
+              if (notifications.length > 0) {
+                // Update the notification panel with the received notifications
+                for (var i = 0; i < notifications.length; i++) {
+                  var notification = notifications[i];
+                  var message = notification.message;
+                  var createdAt = notification.created_at;
+                  var isRead = notification.is_read; // Retrieve the "is_read" field from the notification
+      
+                  // Create the notification item
+                  var notificationItem = $('<div class="dropdown-foot dropdown-notification"><a href="#">' + message + '</a><em class="icon ni ni-clock ms-2" data-toggle="tooltip" data-placement="top" title="' + createdAt + '"></em></div>');
+      
+                  // Append the notification item to the panel
+                  $('.nk-notification').append(notificationItem);
+      
+                  // Check if the notification is unread
+                  if (!isRead) {
+                    hasUnread = true; // Set the flag to true if there is at least one unread notification
+                  }
+                }
+      
+                // Reinitialize tooltips
+                $('[data-toggle="tooltip"]').tooltip();
+              } else {
+                // Show a message indicating no notifications
+                $('.nk-notification').append('<div class="dropdown-foot dropdown-notification"><p href="#">Bildirim bulunmamaktatır.</p></div>');
+              }
+      
+              // Add or remove the red dot based on the flag
+              if (hasUnread) {
+                $('.notification-dropdown').append('<span class="unread-indicator"></span>');
+              } else {
+                $('.unread-indicator').remove();
+              }
+            },
+            error: function() {
+              // Handle error if the AJAX request fails
+              console.error('Failed to retrieve notifications.');
+            }
+          });
+        });
+    </script>
+    <script>
+        // Click event for opening the dropdown
+        $('.notification-toggle').click(function() {
+            // Remove the unread indicator
+            $('.unread-indicator').remove();
+        
+            // AJAX request to mark notifications as read
+            $.ajax({
+                url: "{% url 'mark_notifications_as_read' %}",
+                method: 'POST',
+                success: function() {
+                console.log('Notifications marked as read.');
+                },
+                error: function() {
+                console.error('Failed to mark notifications as read.');
+                }
+            });
+            });
+    </script>
+</body>
+
+</html>

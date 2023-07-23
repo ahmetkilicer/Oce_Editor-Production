@@ -1,0 +1,605 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="tr-TR" class="js">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="HTML and PDF Editor for OCE App, Produced by IQVIA">
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="{% static 'images/iqvialogoicon.png' %}">
+    <!-- Page Title  -->
+    <title>IQVIA | OCE Editor</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="{% static 'css/dashlite.css' %}">
+    <link id="skin-default" rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+
+
+<body class="nk-body npc-apps apps-only has-apps-sidebar npc-apps-files">
+    {% if user.dark_mode %}
+    <script>
+        var toggle = document.getElementsByClassName('dark-switch')[0];
+        var body = document.getElementsByTagName('body')[0];
+        body.classList.add('dark-mode');
+        toggle.classList.add('active');
+    </script>
+    {% endif %}
+    <div class="nk-app-root">
+        <!-- main @s -->
+        <div class="nk-main ">
+            <!-- wrap @s -->
+            <div class="nk-wrap ">
+                <!-- main header @s -->
+                <div class="nk-header nk-header-fixed is-light">
+                    <div class="container-fluid">
+                        <div class="nk-header-wrap">
+                            <div class="nk-header-app-name">
+                                    <img class="logo-img img-fluid me-3" style="max-width:170px;" src="{% static 'images/iqvialogo.png' %}" srcset="{% static 'images/iqvialogo.png' %}" alt="logo">
+                                <div class="nk-header-app-info">
+                                    <span class="lead-text ms-4">OCE Editor</span>
+                                </div>
+                            </div>
+                            <div class="nk-header-tools">
+                                <ul class="nk-quick-nav">
+                                    <li class="dropdown help-dropdown">
+                                        <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
+                                            <div class=""><em class="icon icon-circle bg-success-dim ni ni-help"></em></div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end">
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title">SSS</span>
+                                            </div>
+                                            <div class="dropdown-body">
+                                                <div class="nk-help">
+                                                    <div class="dropdown-foot">
+                                                        <a href="#">Nasıl sekans eklerim?</a>
+                                                    </div>
+                                                    <div class="dropdown-foot">
+                                                        <a href="#">Sunumu OCE'ye nasıl gönderebilirim?</a>
+                                                    </div>
+                                                    <div class="dropdown-foot">
+                                                        <a href="#">bla bla</a>
+                                                    </div>
+                                                </div><!-- .nk-notification -->
+                                            </div><!-- .nk-dropdown-body -->
+                                            <div class="dropdown-foot dropdown-notification center">
+                                                <a href="#">Hepsini Görüntüle</a>
+                                            </div>
+                                        </div>
+                                    </li><!-- .dropdown -->
+                                    <li class="dropdown notification-dropdown">
+                                        <a href="#" class="dropdown-toggle nk-quick-nav-icon notification-toggle" data-bs-toggle="dropdown">
+                                            <div class=""><em class="icon icon-circle ni ni-bell"></em></div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end">
+                                            <div class="dropdown-head">
+                                                <span class="sub-title nk-dropdown-title">BİLDİRİMLER</span>
+                                            </div>
+                                            <div class="dropdown-body">
+                                                <div class="nk-notification">
+                                                    <div id="notification-panel">
+                                                        <!-- Notifications will be dynamically added here -->
+                                                    </div>
+                                                </div>
+                                            </div><!-- .nk-dropdown-body -->
+                                        </div>
+                                    </li><!-- .dropdown -->                                 
+                                    <li class="dropdown user-dropdown">
+                                        <a href="#" class="dropdown-toggle me-n1" data-bs-toggle="dropdown">
+                                            <div class="user-toggle">
+                                                <div class="user-avatar sm">
+                                                    <img class="logo-img img-fluid" style="max-width:170px;" src="{% if user.company.logo %}{{ user.company.logo.url }}{% else %}{% static 'images/company_logo.png' %}{% endif %}" alt="logo">
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end">
+                                            <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
+                                                <div class="user-card">
+                                                    <div class="user-avatar">
+                                                        <span>{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+                                                    </div>
+                                                    <div class="user-info">
+                                                        <span class="lead-text">{{ user.company.name }}</span>
+                                                        <span class="sub-text">{{ user.first_name }} {{ user.last_name }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="{% url 'settings' %}"><em class="icon ni ni-setting-alt"></em><span>Ayarlar</span></a></li>
+                                                    <li><a id="darkModeLink" class="dark-switch"><em class="icon ni ni-moon"></em><span>Koyu Tema</span></a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="dropdown-inner">
+                                                <ul class="link-list">
+                                                    <li><a href="{% url 'logout' %}"><em class="icon ni ni-signout"></em><span>Çıkış Yap</span></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- main header @e -->
+
+                <!-- content @s -->
+                <div class="nk-content p-0">
+                    <div class="nk-content-inner">
+                        <div class="nk-content-body">
+                            <div class="nk-fmg">
+                                <div class="nk-fmg-aside" data-content="files-aside" data-toggle-overlay="true" data-toggle-body="true" data-toggle-screen="lg" data-simplebar>
+                                    <div class="nk-fmg-aside-wrap">
+                                        <div class="nk-fmg-aside-top">
+                                            <ul class="nk-fmg-menu">
+                                                <li class="active">
+                                                    <a class="nk-fmg-menu-item" href="{% url 'folders' %}">
+                                                        <em class="icon ni ni-file-docs"></em>
+                                                        <span class="nk-fmg-menu-text">Klasörler</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="nk-fmg-menu-item" href="{% url 'presentation_list' %}">
+                                                        <em class="icon ni ni-img"></em>
+                                                        <span class="nk-fmg-menu-text">Sunumlar</span>
+                                                    </a>
+                                                </li>                        
+                                                <li>
+                                                    <a class="nk-fmg-menu-item" href="{% url 'settings' %}">
+                                                        <em class="icon ni ni-setting-alt"></em>
+                                                        <span class="nk-fmg-menu-text">Ayarlar</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div><!-- .nk-fmg-aside -->
+                                <div class="nk-fmg-body">
+                                    <div class="nk-fmg-body-head d-none d-lg-flex">
+                                        <div class="nk-fmg-search">
+                                            <em class="icon ni ni-search"></em>
+                                            <input type="text" id="searchInput" class="form-control border-transparent form-focus-none" placeholder="Klasör Ara">
+                                        </div>
+                                        <div class="nk-fmg-actions">
+                                            <ul class="nk-block-tools g-3">
+                                                <li>
+                                                    <a href="#file-create" class="btn btn-light" data-bs-toggle="modal"><em class="icon ni ni-plus"></em> <span>Yeni Klasör</span></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="nk-fmg-body-content">
+                                        <div class="nk-block-head nk-block-head-sm">
+                                            <div class="nk-block-between position-relative">
+                                                <div class="nk-block-head-content">
+                                                    <h3 class="nk-block-title page-title">Klasörler</h3>
+                                                </div>
+                                                <div class="nk-block-head-content">
+                                                    <ul class="nk-block-tools g-1">
+                                                        <li class="d-lg-none" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Search">
+                                                            <a href="#" class="btn btn-trigger btn-icon search-toggle toggle-search" data-target="search"><em class="icon ni ni-search"></em></a>
+                                                        </li>
+                                                        <li class="d-lg-none" data-bs-toggle="tooltip" data-bs-placement="bottom" title="List View">
+                                                            <a href="{% url 'folder_list' %}" class="btn btn-trigger btn-icon"><em class="icon ni ni-view-row-wd"></em></a>
+                                                        </li>
+                                                        <li class="d-lg-none" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create File">
+                                                            <a href="#file-create" class="btn btn-trigger btn-icon" data-bs-toggle="modal"><em class="icon ni ni-plus"></em></a>
+                                                        </li>
+                                                        <li class="d-lg-none me-n1" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Menu">
+                                                            <a href="#" class="btn btn-trigger btn-icon toggle" data-target="files-aside"><em class="icon ni ni-menu-alt-r"></em></a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="search-wrap px-2 d-lg-none" data-search="search">
+                                                    <div class="search-content">
+                                                        <a href="#" class="search-back btn btn-icon toggle-search" data-target="search"><em class="icon ni ni-arrow-left"></em></a>
+                                                        <input type="text" class="form-control border-transparent form-focus-none" placeholder="Klasör Ara">
+                                                        <button class="search-submit btn btn-icon"><em class="icon ni ni-search"></em></button>
+                                                    </div>
+                                                </div><!-- .search-wrap -->
+                                                <div class="nk-block-head-content d-none d-lg-block">
+                                                    <ul class="nk-block-tools g-3">
+                                                        <li data-bs-toggle="tooltip" data-bs-placement="left" title="Izgara Görünümü"><a href="{% url 'folders' %}" class="nk-switch-icon active"><em class="icon ni ni-view-grid3-wd"></em></a></li>
+                                                        <li data-bs-toggle="tooltip" data-bs-placement="left" title="Liste Görünümü"><a href="{% url 'folder_list' %}" class="nk-switch-icon"><em class="icon ni ni-view-row-wd"></em></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div><!-- .nk-block-head -->
+                                        <div class="nk-fmg-listing nk-block">
+                                            <div class="nk-files nk-files-view-grid">
+                                                <div class="nk-files-list" id='allfiles'>
+                                                    {% if folders %}
+                                                        {% for folder in folders %}
+                                                        <div class="nk-file-item nk-file" data-search-id="{{folder.name}}" href="{% url 'folder_details' folder.id %}">
+                                                            <div class="nk-file-info">
+                                                                <div class="nk-file-title">
+                                                                    <div class="nk-file-icon">
+                                                                        <a class="nk-file-icon-link" href="{% url 'folder_details' folder.id %}">
+                                                                            <span class="nk-file-icon-type">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 75 75">
+                                                                                    <path fill="#6C87FE" d="M57.5,31h-23c-1.4,0-2.5-1.1-2.5-2.5v-10c0-1.4,1.1-2.5,2.5-2.5h23c1.4,0,2.5,1.1,2.5,2.5v10C60,29.9,58.9,31,57.5,31z" />
+                                                                                    <path fill="#8AA3FF" d="M59.8,61H12.2C8.8,61,6,58,6,54.4V17.6C6,14,8.8,11,12.2,11h18.5c1.7,0,3.3,1,4.1,2.6L38,24h21.8c3.4,0,6.2,2.4,6.2,6v24.4C66,58,63.2,61,59.8,61z" />
+                                                                                    <path display="none" fill="#8AA3FF" d="M62.1,61H9.9C7.8,61,6,59.2,6,57c0,0,0-31.5,0-42c0-2.2,1.8-4,3.9-4h19.3c1.6,0,3.2,0.2,3.9,2.3l2.7,6.8c0.5,1.1,1.6,1.9,2.8,1.9h23.5c2.2,0,3.9,1.8,3.9,4v31C66,59.2,64.2,61,62.1,61z" />
+                                                                                    <path fill="#798BFF" d="M7.7,59c2.2,2.4,4.7,2,6.3,2h45c1.1,0,3.2,0.1,5.3-2H7.7z" />
+                                                                                </svg>
+                                                                            </span>
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="nk-file-name">
+                                                                        <div class="nk-file-name-text">
+                                                                            <a href="{% url 'folder_details' folder.id %}" class="title">{{folder.name}}</a>                                                                    
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <ul class="nk-file-desc">
+                                                                    <li class="size">{{ folder.total_size|floatformat:1 }} MB</li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="nk-file-actions">
+                                                                <div class="dropdown">
+                                                                    <a href="" class="dropdown-toggle btn btn-sm btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                                        <ul class="link-list-plain no-bdr">
+                                                                            <li><a href="#file-details-{{folder.id}}" data-bs-toggle="modal"><em class="icon ni ni-eye"></em><span>Detaylar</span></a></li>
+                                                                            <li><a href="#file-rename-{{folder.id}}" data-bs-toggle="modal"><em class="icon ni ni-pen"></em><span>Yeniden Adlandır</span></a></li>
+                                                                            <li><a href="#file-delete-{{folder.id}}" data-bs-toggle="modal"><em class="icon ni ni-trash"></em><span>Sil</span></a></li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div><!-- .nk-file -->
+                                                        {% endfor %}
+                                                    {% else %}
+                                                    <div class='d-flex align-items-center mt-3'>
+                                                        <em style='font-size:30px;' class="icon ni ni-folder-remove"></em>
+                                                        <h6 class='mt-1 ms-4'> Klasör Bulunamadı </h6>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div><!-- .nk-files -->
+                                        </div><!-- .nk-block -->
+                                    </div><!-- .nk-fmg-body-content -->
+                                </div><!-- .nk-fmg-body -->
+                            </div><!-- .nk-fmg -->
+                        </div>
+                    </div>
+                </div>
+                <!-- content @e -->
+            </div>
+            <!-- wrap @e -->
+        </div>
+        <!-- main @e -->
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="file-create">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-center">
+                    <div class="nk-file-title">
+                        <div class="nk-file-icon">
+                            <span class="nk-file-icon-type">
+                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 72 72">
+                                    <path fill="#6C87FE" d="M57.5,31h-23c-1.4,0-2.5-1.1-2.5-2.5v-10c0-1.4,1.1-2.5,2.5-2.5h23c1.4,0,2.5,1.1,2.5,2.5v10C60,29.9,58.9,31,57.5,31z" />
+                                    <path fill="#8AA3FF" d="M59.8,61H12.2C8.8,61,6,58,6,54.4V17.6C6,14,8.8,11,12.2,11h18.5c1.7,0,3.3,1,4.1,2.6L38,24h21.8c3.4,0,6.2,2.4,6.2,6v24.4C66,58,63.2,61,59.8,61z" />
+                                    <path display="none" fill="#8AA3FF" d="M62.1,61H9.9C7.8,61,6,59.2,6,57c0,0,0-31.5,0-42c0-2.2,1.8-4,3.9-4h19.3c1.6,0,3.2,0.2,3.9,2.3l2.7,6.8c0.5,1.1,1.6,1.9,2.8,1.9h23.5c2.2,0,3.9,1.8,3.9,4v31C66,59.2,64.2,61,62.1,61z" />
+                                    <path fill="#798BFF" d="M7.7,59c2.2,2.4,4.7,2,6.3,2h45c1.1,0,3.2,0.1,5.3-2H7.7z" />
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="nk-file-name">
+                            <div class="nk-file-name-text"><span class="title">Yeni Klasör</span></div>
+                        </div>
+                    </div>
+                    <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                </div>
+                <form action="{% url 'createfolder' %}" method="post">
+                    {% csrf_token %}
+                <div class="modal-body p-0">
+                    <div class="nk-file-share-header">
+                        <div class="nk-file-share-group">
+                            <div class="nk-file-share-input-group">
+                                <div class="nk-file-share-input">
+                                    <label class="label" style="width:90px;" >Klasör Adı</label>
+                                    <input type="text" class="input-mail tagify" name='newfilename' placeholder="Klasör Adını Giriniz">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .modal-body -->
+                <div class="modal-footer bg-light">
+                    <ul class="btn-toolbar g-3">
+                        <li><button href="#" data-bs-dismiss="modal" class="btn btn-outline-light btn-white">İptal</button></li>
+                        <li><button href="#" type='submit' class="btn btn-primary" id='createnewfile'>Oluştur</button></li>
+                    </ul>
+                </div><!-- .modal-footer -->
+            </form>
+            </div><!-- .modal-content -->
+        </div><!-- .modla-dialog -->
+    </div><!-- .modal -->
+    {% for folder in folders %}
+    <!-- app-root @e -->
+    <!-- @@ File Details Modal @e -->
+    <div class="modal fade" data-bs-backdrop="static" tabindex="-1" role="dialog" id="file-details-{{folder.id}}">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-center">
+                    <div class="nk-file-title">
+                        <div class="nk-file-icon">
+                            <span class="nk-file-icon-type">
+                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 72 72">
+                                    <path fill="#6C87FE" d="M57.5,31h-23c-1.4,0-2.5-1.1-2.5-2.5v-10c0-1.4,1.1-2.5,2.5-2.5h23c1.4,0,2.5,1.1,2.5,2.5v10C60,29.9,58.9,31,57.5,31z" />
+                                    <path fill="#8AA3FF" d="M59.8,61H12.2C8.8,61,6,58,6,54.4V17.6C6,14,8.8,11,12.2,11h18.5c1.7,0,3.3,1,4.1,2.6L38,24h21.8c3.4,0,6.2,2.4,6.2,6v24.4C66,58,63.2,61,59.8,61z" />
+                                    <path display="none" fill="#8AA3FF" d="M62.1,61H9.9C7.8,61,6,59.2,6,57c0,0,0-31.5,0-42c0-2.2,1.8-4,3.9-4h19.3c1.6,0,3.2,0.2,3.9,2.3l2.7,6.8c0.5,1.1,1.6,1.9,2.8,1.9h23.5c2.2,0,3.9,1.8,3.9,4v31C66,59.2,64.2,61,62.1,61z" />
+                                    <path fill="#798BFF" d="M7.7,59c2.2,2.4,4.7,2,6.3,2h45c1.1,0,3.2,0.1,5.3-2H7.7z" />
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="nk-file-name">
+                            <div class="nk-file-name-text"><span class="title">{{folder.name}}</span></div>
+                        </div>
+                    </div>
+                    <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+                </div>
+                <div class="modal-body">
+                    <div class="nk-file-details">
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Tür</div>
+                            <div class="nk-file-details-col">Klasör</div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Sunum</div>
+                            <div class="nk-file-details-col">{{folder.num_of_pre}}</div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Boyut</div>
+                            <div class="nk-file-details-col">{{folder.total_size|floatformat:1}} MB</div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Oluşturuldu</div>
+                            <div class="nk-file-details-col">{{folder.created_date}}</div>
+                        </div>
+                        <div class="nk-file-details-row">
+                            <div class="nk-file-details-col">Son Güncelleme</div>
+                            <div class="nk-file-details-col">{{folder.last_updated_date}}</div>
+                        </div>
+                    </div>
+                </div><!-- .modal-body -->
+            </div><!-- .modal-content -->
+        </div><!-- .modla-dialog -->
+</div><!-- .modal -->
+<!-- @@ Share File Modal @e -->
+<form action="{% url 'renamefile' folder.id %}" method="post">
+    {% csrf_token %}
+<div class="modal fade" data-bs-backdrop="static" tabindex="-1" role="dialog" id="file-rename-{{folder.id}}">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header align-center">
+                <div class="nk-file-title">
+                    <div class="nk-file-icon">
+                        <span class="nk-file-icon-type">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 72 72">
+                                <path fill="#6C87FE" d="M57.5,31h-23c-1.4,0-2.5-1.1-2.5-2.5v-10c0-1.4,1.1-2.5,2.5-2.5h23c1.4,0,2.5,1.1,2.5,2.5v10C60,29.9,58.9,31,57.5,31z" />
+                                <path fill="#8AA3FF" d="M59.8,61H12.2C8.8,61,6,58,6,54.4V17.6C6,14,8.8,11,12.2,11h18.5c1.7,0,3.3,1,4.1,2.6L38,24h21.8c3.4,0,6.2,2.4,6.2,6v24.4C66,58,63.2,61,59.8,61z" />
+                                <path display="none" fill="#8AA3FF" d="M62.1,61H9.9C7.8,61,6,59.2,6,57c0,0,0-31.5,0-42c0-2.2,1.8-4,3.9-4h19.3c1.6,0,3.2,0.2,3.9,2.3l2.7,6.8c0.5,1.1,1.6,1.9,2.8,1.9h23.5c2.2,0,3.9,1.8,3.9,4v31C66,59.2,64.2,61,62.1,61z" />
+                                <path fill="#798BFF" d="M7.7,59c2.2,2.4,4.7,2,6.3,2h45c1.1,0,3.2,0.1,5.3-2H7.7z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="nk-file-name">
+                        <div class="nk-file-name-text"><span class="title">Değiştir - {{folder.name}}</span></div>
+                    </div>
+                </div>
+                <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            </div>
+            <div class="modal-body p-0">
+                <div class="nk-file-share-header">
+                    <div class="nk-file-share-group">
+                        <div class="nk-file-share-input-group">
+                            <div class="nk-file-share-input">
+                                <label class="label" style="width:90px;">Klasör Adı:</label>
+                                <input type="text" class="input-mail tagify" placeholder="Enter File Name" name='newfilename'>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- .modal-body -->
+            <div class="modal-footer bg-light">
+                <ul class="btn-toolbar g-3">
+                    <li><button href="#" data-bs-dismiss="modal" class="btn btn-outline-light btn-white">İptal</button></li>
+                    <li><button type='submit' class="btn btn-primary">Kaydet</button></li>
+                </ul>
+            </div><!-- .modal-footer -->
+        </div><!-- .modal-content -->
+    </div><!-- .modla-dialog -->
+</div><!-- .modal -->
+</form>
+<div class="modal fade" data-bs-backdrop="static" tabindex="-1" role="dialog" id="file-delete-{{folder.id}}">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header align-center">
+                <div class="nk-file-title">
+                    <div class="nk-file-icon">
+                        <span class="nk-file-icon-type">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 72 72">
+                                <path fill="#6C87FE" d="M57.5,31h-23c-1.4,0-2.5-1.1-2.5-2.5v-10c0-1.4,1.1-2.5,2.5-2.5h23c1.4,0,2.5,1.1,2.5,2.5v10C60,29.9,58.9,31,57.5,31z" />
+                                <path fill="#8AA3FF" d="M59.8,61H12.2C8.8,61,6,58,6,54.4V17.6C6,14,8.8,11,12.2,11h18.5c1.7,0,3.3,1,4.1,2.6L38,24h21.8c3.4,0,6.2,2.4,6.2,6v24.4C66,58,63.2,61,59.8,61z" />
+                                <path display="none" fill="#8AA3FF" d="M62.1,61H9.9C7.8,61,6,59.2,6,57c0,0,0-31.5,0-42c0-2.2,1.8-4,3.9-4h19.3c1.6,0,3.2,0.2,3.9,2.3l2.7,6.8c0.5,1.1,1.6,1.9,2.8,1.9h23.5c2.2,0,3.9,1.8,3.9,4v31C66,59.2,64.2,61,62.1,61z" />
+                                <path fill="#798BFF" d="M7.7,59c2.2,2.4,4.7,2,6.3,2h45c1.1,0,3.2,0.1,5.3-2H7.7z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="nk-file-name">
+                        <div class="nk-file-name-text"><span class="title">Silmeyi Onayla - {{folder.name}}</span></div>
+                    </div>
+                </div>
+                <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+            </div>
+            <div class="modal-body p-0">
+                <div class="nk-file-share-header">
+                    <div class="nk-file-share-group">
+                        <div class="nk-file-share-input-group">
+                            <div class="nk-file-share-input">
+                                <p>Silmek istediğinize emin misiniz?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- .modal-body -->
+            <div class="modal-footer bg-light">
+                <ul class="btn-toolbar g-3">
+                    <li><a href="#" data-bs-dismiss="modal" class="btn btn-outline-light btn-white">İptal</a></li>
+                    <li><a href="{% url 'deletefile' folder.id %}" class="btn btn-danger">Sil</a></li>
+                </ul>
+            </div><!-- .modal-footer -->
+        </div><!-- .modal-content -->
+    </div><!-- .modla-dialog -->
+</div><!-- .modal -->
+
+    {% endfor %}
+
+    <!--Alertsss-->
+   
+
+    <!-- footer @s -->
+    <div class="nk-footer">
+        <div class="container-fluid">
+            <div class="nk-footer-wrap">
+                <div class="nk-footer-copyright ms-auto">Tüm Hakları Saklıdır. &copy; 2023  <a href="https://www.iqvia.com/tr-tr/locations/turkey" target="_blank">IQVIA  </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- footer @e -->
+    <!-- JavaScript -->
+    <script src="{% static 'js/bundle.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/jquery-3.6.0.js' %}"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        // Get references to the input element and the divs containing the search results
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.querySelectorAll('[data-search-id]');
+
+        // Add event listener to the input element
+        searchInput.addEventListener('input', function () {
+            const searchText = this.value.toLowerCase().trim();
+
+            // Loop through each search result div and check if it includes the search text
+            searchResults.forEach(function (result) {
+                const searchId = result.getAttribute('data-search-id').toLowerCase();
+
+                // Show or hide the div based on the search text match
+                if (searchId.includes(searchText)) {
+                    result.style.display = 'block';
+                } else {
+                    result.style.display = 'none';
+                }
+            });
+        });
+    </script> 
+    <script>
+        $(document).ready(function() {
+            var darkModeSwitch = $("#darkModeLink");
+            window.CSRF_TOKEN = "{{ csrf_token }}";
+        
+            darkModeSwitch.click(function(event) {
+              event.preventDefault(); // Prevent the default link behavior
+        
+              var darkModeEnabled = darkModeSwitch.hasClass("active"); // Check if the switch is currently enabled
+        
+              // Make an AJAX request to the server to update the user's dark_mode field
+              $.ajax({
+                url: "{% url 'update_dark_mode' %}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                  dark_mode: !darkModeEnabled, // Toggle the value of dark_mode
+                  'csrfmiddlewaretoken': window.CSRF_TOKEN
+                },
+                success: function(response) {
+                  console.log("Dark mode updated");
+                },
+                error: function(xhr, status, error) {
+                  console.error("Error updating dark mode");
+                }
+              });
+            });
+          });
+    </script>
+    <script>
+        $(document).ready(function() {
+          // AJAX request to get notifications
+          $.ajax({
+            url: "{% url 'get_notifications' %}",
+            dataType: 'json',
+            success: function(data) {
+              // Process the received notifications
+              var notifications = data.notifications;
+              var hasUnread = false; // Flag to check if there are unread notifications
+      
+              if (notifications.length > 0) {
+                // Update the notification panel with the received notifications
+                for (var i = 0; i < notifications.length; i++) {
+                  var notification = notifications[i];
+                  var message = notification.message;
+                  var createdAt = notification.created_at;
+                  var isRead = notification.is_read; // Retrieve the "is_read" field from the notification
+      
+                  // Create the notification item
+                  var notificationItem = $('<div class="dropdown-foot dropdown-notification"><a href="#">' + message + '</a><em class="icon ni ni-clock ms-2" data-toggle="tooltip" data-placement="top" title="' + createdAt + '"></em></div>');
+      
+                  // Append the notification item to the panel
+                  $('.nk-notification').append(notificationItem);
+      
+                  // Check if the notification is unread
+                  if (!isRead) {
+                    hasUnread = true; // Set the flag to true if there is at least one unread notification
+                  }
+                }
+      
+                // Reinitialize tooltips
+                $('[data-toggle="tooltip"]').tooltip();
+              } else {
+                // Show a message indicating no notifications
+                $('.nk-notification').append('<div class="dropdown-foot dropdown-notification"><p href="#">Bildirim bulunmamaktatır.</p></div>');
+              }
+      
+              // Add or remove the red dot based on the flag
+              if (hasUnread) {
+                $('.notification-dropdown').append('<span class="unread-indicator"></span>');
+              } else {
+                $('.unread-indicator').remove();
+              }
+            },
+            error: function() {
+              // Handle error if the AJAX request fails
+              console.error('Failed to retrieve notifications.');
+            }
+          });
+        });
+    </script>
+    <script>
+        // Click event for opening the dropdown
+        $('.notification-toggle').click(function() {
+            // Remove the unread indicator
+            $('.unread-indicator').remove();
+        
+            // AJAX request to mark notifications as read
+            $.ajax({
+                url: "{% url 'mark_notifications_as_read' %}",
+                method: 'POST',
+                success: function() {
+                console.log('Notifications marked as read.');
+                },
+                error: function() {
+                console.error('Failed to mark notifications as read.');
+                }
+            });
+            });
+    </script>
+</body>
+
+</html>

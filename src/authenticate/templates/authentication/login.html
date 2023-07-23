@@ -1,0 +1,102 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="tr-TR" class="js">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="HTML and PDF Editor for OCE App, Produced by IQVIA">
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="{% static 'images/iqvialogoicon.png' %}">
+    <!-- Page Title  -->
+    <title>IQVIA | OCE Editor</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="{% static 'css/dashlite.css' %}">
+    <link id="skin-default" rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+
+<body class="nk-body bg-white npc-general pg-auth">
+    <div class="nk-app-root">
+        <!-- main @s -->
+        <div class="nk-main ">
+            <!-- wrap @s -->
+            <div class="nk-wrap nk-wrap-nosidebar">
+                <!-- content @s -->
+                <div class="nk-content ">
+                    <div class="brand-logo text-center mt-3">
+                        {% comment %} <div class="logo-link">
+                            <img class="logo-img logo-img-lg " src="{% static 'images/iqvialogo.png' %}" srcset="{% static 'images/logo_big.png' %}" alt="logo">
+                        </div> {% endcomment %}
+                        <div class="logo-link">
+                            <img class="logo-img logo-img-sm" src="{% static 'images/iqvialogo.png' %}" srcset="{% static 'images/iqvialogo.png' %}" alt="logo">
+                        </div>
+                    </div>
+                    <div class="nk-block nk-block-middle nk-auth-body  large-medium">
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-danger text-center" role="alert">
+                                {{ message|linebreaksbr }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="card card-bordered">
+                            <div class="card-inner card-inner-lg">
+                                <div class="nk-block-head">
+                                    <div class="nk-block-head-content">
+                                        <h4 class="nk-block-title">Oturum Aç</h4>
+                                    </div>
+                                </div>
+                                <form action="" method='POST'>
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <div class="form-label-group">
+                                            <label class="form-label" for="username">Kullanıcı Adı</label>
+                                        </div>
+                                        <div class="form-control-wrap">
+                                            <input type="text" class="form-control form-control-lg" id="username" name='username' placeholder="Kullanıcı Adınızı Giriniz">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="form-label-group">
+                                            <label class="form-label" for="password">Şifre</label>
+                                           {% comment %}  <a class="link link-primary link-sm" href="#">Forgot Code?</a> {% endcomment %}
+                                        </div>
+                                        <div class="form-control-wrap">
+                                            <a class="form-icon form-icon-right passcode-switch lg" data-target="password">
+                                                <em class="passcode-icon icon-show icon ni ni-eye"></em>
+                                                <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
+                                            </a>
+                                            <input type="password" class="form-control form-control-lg" id="password" name='password' placeholder="Şifrenizi Giriniz">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-lg btn-primary btn-block">Giriş Yap</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- footer @s -->
+                    <div class="nk-footer">
+                        <div class="container-fluid">
+                            <div class="nk-footer-wrap">
+                                <div class="nk-footer-copyright ms-auto">Tüm Hakları Saklıdır. &copy; 2023  <a href="https://www.iqvia.com/tr-tr/locations/turkey" target="_blank">IQVIA  </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- footer @e -->
+                </div>
+                <!-- wrap @e -->
+            </div>
+            <!-- content @e -->
+        </div>
+        <!-- main @e -->
+    </div>
+    <!-- app-root @e -->
+    <!-- JavaScript -->
+    <script src="{% static 'js/bundle.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+
+</html>
